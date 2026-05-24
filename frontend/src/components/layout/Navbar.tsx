@@ -9,20 +9,16 @@ export default function Navbar() {
                 </Link>
 
                 <div className="hidden gap-10 text-sm uppercase tracking-wide text-zinc-300 lg:flex">
-                    <Link href="/setups" className="hover:text-white">
+                    <Link href="/browse" className="hover:text-white">
                         Browse Setups
                     </Link>
 
-                    <Link href="/" className="hover:text-white">
-                        Top Setups
+                    <Link href="/upload" className="hover:text-white">
+                        Upload Setup
                     </Link>
 
-                    <Link href="/" className="hover:text-white">
-                        Community
-                    </Link>
-
-                    <Link href="/" className="hover:text-white">
-                        Support
+                    <Link href="/my-setups" className="hover:text-white">
+                        My Setups
                     </Link>
                 </div>
 

@@ -27,8 +27,6 @@ export default function Home() {
 
       {/* Foreground Content */}
       <div className="relative z-10">
-        <Navbar />
-
         <div className="mx-auto max-w-[1800px] px-12 pt-20 pb-20">
           <HeroSection />
           <GameGrid />
