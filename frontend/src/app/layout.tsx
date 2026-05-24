@@ -19,6 +19,10 @@ export const metadata: Metadata = {
   description: "Find and share sim racing setups.",
 };
 
+// TODO: Work on clerk auth linkage
+// TODO: Make sure all buttons work and take you where you need
+
+
 export default function RootLayout({
   children,
 }: Readonly<{

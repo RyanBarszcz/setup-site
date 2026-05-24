@@ -1,5 +1,5 @@
 import GameCard from "./GameCard";
-import { apiGet } from "@/lib/api";
+import { apiFetch } from "@/lib/api";
 
 type Game = {
     id: string;
@@ -7,7 +7,7 @@ type Game = {
 };
 
 export default async function GameGrid() {
-    const games = await apiGet<{ games: Game[] }>("/games");
+    const games = await apiFetch<{ games: Game[] }>("/games");
     console.log("games", games);
 
     return (

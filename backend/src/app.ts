@@ -6,6 +6,7 @@ import trackRoutes from "./routes/track.routes";
 import carRoutes from "./routes/car.routes";
 import tagRoutes from "./routes/tag.routes";
 import setupRoutes from "./routes/setup.routes";
+import authRoutes from "./routes/auth.routes.js";
 
 const app = express();
 
@@ -23,5 +24,6 @@ app.use("/tracks", trackRoutes);
 app.use("/cars", carRoutes);
 app.use("/tags", tagRoutes);
 app.use("/setups", setupRoutes);
+app.use("/auth", authRoutes);
 
 export default app;

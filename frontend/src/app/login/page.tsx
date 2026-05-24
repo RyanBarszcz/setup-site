@@ -2,12 +2,20 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useSignIn } from "@clerk/nextjs/legacy";
 
 export default function LoginPage() {
+    const router = useRouter();
+    const { signIn, setActive, isLoaded } = useSignIn();
+
     const [formData, setFormData] = useState({
         email: "",
         password: "",
     });
+
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
     function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
         setFormData({
@@ -19,17 +27,35 @@ export default function LoginPage() {
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
 
-        console.log("Login data:", formData);
+        if (!isLoaded) return;
 
-        // Later:
-        // await api.post("/auth/login", formData);
+        try {
+            setLoading(true);
+            setError("");
+
+            const result = await signIn.create({
+                identifier: formData.email,
+                password: formData.password,
+            });
+
+            if (result.status === "complete") {
+                await setActive({
+                    session: result.createdSessionId,
+                });
+
+                router.push("/");
+            }
+        } catch (err) {
+            console.error(err);
+            setError("Invalid email or password.");
+        } finally {
+            setLoading(false);
+        }
     }
 
     return (
         <main className="min-h-screen bg-black text-white flex items-center justify-center p-6">
             <div className="w-[95vw] max-w-[1800px] h-[90vh] rounded-3xl overflow-hidden border border-white/10 bg-zinc-950 shadow-2xl flex">
-
-                {/* LEFT IMAGE SIDE */}
                 <div className="relative w-1/2">
                     <img
                         src="/backgrounds/login.jpg"
@@ -48,26 +74,30 @@ export default function LoginPage() {
                             Access your saved setups, uploads, and favorite sim
                             racing configurations.
                         </p>
+
+                        <p className="mt-8 text-sm text-zinc-500">
+                            © 2026 Pitlane
+                        </p>
                     </div>
                 </div>
 
-                {/* RIGHT FORM SIDE */}
                 <div className="w-1/2 bg-zinc-950 flex items-center">
                     <div className="w-full max-w-md mx-auto px-10">
                         <div>
-                            <h2 className="text-3xl font-bold">
-                                Sign in
-                            </h2>
+                            <h2 className="text-3xl font-bold">Sign in</h2>
 
                             <p className="mt-2 text-zinc-400">
                                 Continue to your garage.
                             </p>
                         </div>
 
-                        <form
-                            onSubmit={handleSubmit}
-                            className="mt-8 space-y-5"
-                        >
+                        {error && (
+                            <p className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+                                {error}
+                            </p>
+                        )}
+
+                        <form onSubmit={handleSubmit} className="mt-8 space-y-5">
                             <div>
                                 <label className="text-sm text-zinc-400">
                                     Email
@@ -79,6 +109,7 @@ export default function LoginPage() {
                                     value={formData.email}
                                     onChange={handleChange}
                                     placeholder="FHermann@rbracing.com"
+                                    required
                                     className="mt-2 w-full rounded-xl bg-zinc-900 border border-zinc-700 px-4 py-3 outline-none focus:border-red-500"
                                 />
                             </div>
@@ -94,26 +125,28 @@ export default function LoginPage() {
                                     value={formData.password}
                                     onChange={handleChange}
                                     placeholder="••••••••"
+                                    required
                                     className="mt-2 w-full rounded-xl bg-zinc-900 border border-zinc-700 px-4 py-3 outline-none focus:border-red-500"
                                 />
                             </div>
 
-                            <div className="flex justify-end">
-                                <Link
-                                    href="/forgot-password"
-                                    className="text-sm text-zinc-400 hover:text-red-400 transition"
-                                >
-                                    Forgot password?
-                                </Link>
-                            </div>
-
                             <button
                                 type="submit"
-                                className="w-full rounded-xl bg-red-600 py-3 font-semibold text-white hover:bg-red-500 transition"
+                                disabled={loading}
+                                className="w-full rounded-xl bg-red-600 py-3 font-semibold text-white hover:bg-red-500 transition disabled:opacity-60"
                             >
-                                Sign in
+                                {loading ? "Signing in..." : "Sign in"}
                             </button>
                         </form>
+
+                        <div className="flex justify-center mt-6">
+                            <Link
+                                href="/forgot-password"
+                                className="text-sm text-zinc-400 hover:text-red-400 transition"
+                            >
+                                Forgot password?
+                            </Link>
+                        </div>
 
                         <div className="flex justify-center mt-6">
                             <p className="text-sm text-zinc-400">
