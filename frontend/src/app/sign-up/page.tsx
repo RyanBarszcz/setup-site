@@ -5,10 +5,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSignUp } from "@clerk/nextjs/legacy";
 import { registerAccount } from "@/lib/api";
+import Image from "next/image";
 
 export default function SignUpPage() {
     const router = useRouter();
-    const { signUp, setActive, isLoaded } = useSignUp();
+    const { isLoaded } = useSignUp();
 
     const [formData, setFormData] = useState({
         name: "",

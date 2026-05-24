@@ -6,7 +6,7 @@ import trackRoutes from "./routes/track.routes";
 import carRoutes from "./routes/car.routes";
 import tagRoutes from "./routes/tag.routes";
 import setupRoutes from "./routes/setup.routes";
-import authRoutes from "./routes/auth.routes.js";
+import authRoutes from "./routes/auth.routes";
 
 const app = express();
 

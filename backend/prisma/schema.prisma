@@ -34,7 +34,7 @@ enum WeatherType {
 
 model User {
   id             String     @id @default(cuid())
-  authProviderId String     @unique
+  clerkId String     @unique
   username       String     @unique
   displayName    String
   email          String     @unique
