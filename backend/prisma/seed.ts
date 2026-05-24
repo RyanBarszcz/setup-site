@@ -246,6 +246,161 @@ async function main() {
         });
     }
 
+    const demoUser = await prisma.user.upsert({
+    where: {
+        authProviderId: "demo_clerk_user_1",
+    },
+    update: {},
+    create: {
+        authProviderId: "demo_clerk_user_1",
+        username: "apexhunter",
+        displayName: "Apex Hunter",
+        email: "apexhunter@example.com",
+        bio: "GT3 setup builder focused on stable race setups.",
+    },
+});
+
+const stableTag = await prisma.tag.findUniqueOrThrow({
+    where: { slug: "stable" },
+});
+
+const raceTag = await prisma.tag.findUniqueOrThrow({
+    where: { slug: "race" },
+});
+
+const topSpeedTag = await prisma.tag.findUniqueOrThrow({
+    where: { slug: "top-speed" },
+});
+
+const tireSavingTag = await prisma.tag.findUniqueOrThrow({
+    where: { slug: "tire-saving" },
+});
+
+const ferrari296 = await prisma.car.findFirstOrThrow({
+    where: {
+        slug: "ferrari-296-gt3",
+        gameId: acc.id,
+    },
+});
+
+const porsche911 = await prisma.car.findFirstOrThrow({
+    where: {
+        slug: "porsche-911-gt3-r",
+        gameId: acc.id,
+    },
+});
+
+const mazdaMx5 = await prisma.car.findFirstOrThrow({
+    where: {
+        slug: "mazda-mx5-cup",
+        gameId: iracing.id,
+    },
+});
+
+const spaFerrariSetup = await prisma.setup.upsert({
+    where: {
+        id: "demo-spa-ferrari-stable-race",
+    },
+    update: {},
+    create: {
+        id: "demo-spa-ferrari-stable-race",
+        userId: demoUser.id,
+        gameId: acc.id,
+        trackId: spa.id,
+        carId: ferrari296.id,
+        title: "Ferrari 296 GT3 Stable Race Setup",
+        description:
+            "Stable race setup for Spa focused on consistency, tire saving, and clean exits.",
+        fileUrl: "https://example.com/setups/ferrari-296-spa-race.json",
+        fileName: "ferrari_296_spa_race.json",
+        fileSize: 4200,
+        fileType: "application/json",
+        lapTimeMs: 138450,
+        setupType: "RACE",
+        weatherType: "DRY",
+        trackCondition: "Optimum",
+        temperatureF: 72,
+        fuelLoad: 60,
+        tireCompound: "Dry",
+        downloadCount: 18,
+        upvoteCount: 7,
+    },
+});
+
+const monzaPorscheSetup = await prisma.setup.upsert({
+    where: {
+        id: "demo-monza-porsche-top-speed",
+    },
+    update: {},
+    create: {
+        id: "demo-monza-porsche-top-speed",
+        userId: demoUser.id,
+        gameId: acc.id,
+        trackId: monza.id,
+        carId: porsche911.id,
+        title: "Porsche 911 GT3 R Monza Top Speed Setup",
+        description:
+            "Low-drag Monza setup built around straight-line speed and stable braking.",
+        fileUrl: "https://example.com/setups/porsche-911-monza-speed.json",
+        fileName: "porsche_911_monza_speed.json",
+        fileSize: 3900,
+        fileType: "application/json",
+        lapTimeMs: 107900,
+        setupType: "QUALIFYING",
+        weatherType: "DRY",
+        trackCondition: "Fast",
+        temperatureF: 78,
+        fuelLoad: 15,
+        tireCompound: "Dry",
+        downloadCount: 31,
+        upvoteCount: 13,
+    },
+});
+
+const watkinsMazdaSetup = await prisma.setup.upsert({
+    where: {
+        id: "demo-watkins-mazda-beginner",
+    },
+    update: {},
+    create: {
+        id: "demo-watkins-mazda-beginner",
+        userId: demoUser.id,
+        gameId: iracing.id,
+        trackId: watkins.id,
+        carId: mazdaMx5.id,
+        title: "Mazda MX-5 Watkins Glen Beginner Race Setup",
+        description:
+            "Beginner-friendly iRacing setup with predictable rotation and safe curb behavior.",
+        fileUrl: "https://example.com/setups/mx5-watkins-beginner.sto",
+        fileName: "mx5_watkins_beginner.sto",
+        fileSize: 2800,
+        fileType: "application/octet-stream",
+        lapTimeMs: 134200,
+        setupType: "RACE",
+        weatherType: "UNKNOWN",
+        trackCondition: "Moderate",
+        temperatureF: 70,
+        fuelLoad: 35,
+        tireCompound: "Default",
+        downloadCount: 9,
+        upvoteCount: 4,
+    },
+});
+
+await prisma.setupTag.createMany({
+    data: [
+        { setupId: spaFerrariSetup.id, tagId: stableTag.id },
+        { setupId: spaFerrariSetup.id, tagId: raceTag.id },
+        { setupId: spaFerrariSetup.id, tagId: tireSavingTag.id },
+
+        { setupId: monzaPorscheSetup.id, tagId: topSpeedTag.id },
+
+        { setupId: watkinsMazdaSetup.id, tagId: stableTag.id },
+        { setupId: watkinsMazdaSetup.id, tagId: raceTag.id },
+    ],
+    skipDuplicates: true,
+});
+
     console.log("Database seeded successfully.");
 }
 

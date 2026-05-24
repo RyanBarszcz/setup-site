@@ -2,6 +2,9 @@ import express from "express";
 import cors from "cors";
 
 import gameRoutes from "./routes/game.routes";
+import trackRoutes from "./routes/track.routes";
+import carRoutes from "./routes/car.routes";
+import tagRoutes from "./routes/tag.routes";
 import setupRoutes from "./routes/setup.routes";
 
 const app = express();
@@ -16,6 +19,9 @@ app.get("/", (_req, res) => {
 });
 
 app.use("/games", gameRoutes);
+app.use("/tracks", trackRoutes);
+app.use("/cars", carRoutes);
+app.use("/tags", tagRoutes);
 app.use("/setups", setupRoutes);
 
 export default app;
