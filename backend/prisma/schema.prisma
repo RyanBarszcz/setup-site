@@ -1,15 +1,237 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum SetupType {
+  QUALIFYING
+  RACE
+  ENDURANCE
+  WET
+  BASELINE
+  HOTLAP
+  SAFE
+  EXPERIMENTAL
+}
+
+enum WeatherType {
+  DRY
+  WET
+  MIXED
+  HOT
+  COLD
+  UNKNOWN
+}
+
+model User {
+  id             String     @id @default(cuid())
+  authProviderId String     @unique
+  username       String     @unique
+  displayName    String
+  email          String     @unique
+  imageUrl       String?
+  bio            String?
+  role           UserRole   @default(USER)
+
+  setups         Setup[]
+  favorites      Favorite[]
+  votes          Vote[]
+  comments       Comment[]
+
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+}
+
+model Game {
+  id        String      @id @default(cuid())
+  name      String      @unique
+  slug      String      @unique
+  imageUrl  String?
+  active    Boolean     @default(true)
+
+  cars      Car[]
+  tracks    GameTrack[]
+  setups    Setup[]
+
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model Track {
+  id        String      @id @default(cuid())
+  name      String
+  slug      String      @unique
+  country   String?
+  imageUrl  String?
+  lengthKm  Float?
+
+  games     GameTrack[]
+  setups    Setup[]
+
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model GameTrack {
+  id         String  @id @default(cuid())
+
+  gameId     String
+  trackId    String
+
+  layoutName String?
+  active     Boolean @default(true)
+
+  game       Game    @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  track      Track   @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  @@unique([gameId, trackId, layoutName])
+}
+
+model Car {
+  id           String   @id @default(cuid())
+
+  gameId       String
+
+  name         String
+  slug         String
+
+  manufacturer String?
+  class        String?
+  drivetrain   String?
+  imageUrl     String?
+
+  active       Boolean  @default(true)
+
+  game         Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  setups       Setup[]
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([gameId, slug])
+}
+
+model Setup {
+  id             String       @id @default(cuid())
+
+  userId         String
+  gameId         String
+  trackId        String
+  carId          String
+
+  title          String
+  description    String?
+
+  fileUrl        String
+  fileName       String
+  fileSize       Int?
+  fileType       String?
+
+  lapTimeMs      Int?
+
+  setupType      SetupType
+  weatherType    WeatherType @default(UNKNOWN)
+
+  trackCondition String?
+  temperatureF   Int?
+
+  fuelLoad       Float?
+  tireCompound   String?
+
+  visibility     String       @default("PUBLIC")
+
+  downloadCount  Int          @default(0)
+  upvoteCount    Int          @default(0)
+
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game           Game         @relation(fields: [gameId], references: [id])
+  track          Track        @relation(fields: [trackId], references: [id])
+  car            Car          @relation(fields: [carId], references: [id])
+
+  tags           SetupTag[]
+  favorites      Favorite[]
+  votes          Vote[]
+  comments       Comment[]
+
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([gameId])
+  @@index([trackId])
+  @@index([carId])
+  @@index([setupType])
+  @@index([createdAt])
+}
+
+model Tag {
+  id        String     @id @default(cuid())
+
+  name      String     @unique
+  slug      String     @unique
+
+  category  String?
+
+  setups    SetupTag[]
+}
+
+model SetupTag {
+  setupId String
+  tagId   String
+
+  setup Setup @relation(fields: [setupId], references: [id], onDelete: Cascade)
+  tag   Tag   @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([setupId, tagId])
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+
+  userId    String
+  setupId   String
+
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  setup     Setup    @relation(fields: [setupId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, setupId])
+}
+
+model Vote {
+  id        String   @id @default(cuid())
+
+  userId    String
+  setupId   String
+
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  setup     Setup    @relation(fields: [setupId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, setupId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+
+  userId    String
+  setupId   String
+
+  body      String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  setup     Setup    @relation(fields: [setupId], references: [id], onDelete: Cascade)
 }
