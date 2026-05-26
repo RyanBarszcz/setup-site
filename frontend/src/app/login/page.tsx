@@ -16,6 +16,8 @@ export default function LoginPage() {
 
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const [needsSecondFactor, setNeedsSecondFactor] = useState(false);
+    const [secondFactorCode, setSecondFactorCode] = useState("");
 
     function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
         setFormData({
@@ -38,16 +40,59 @@ export default function LoginPage() {
                 password: formData.password,
             });
 
-            if (result.status === "complete") {
+            console.log("Sign in result:", result);
+
+            if (result.status === "complete" && result.createdSessionId) {
                 await setActive({
                     session: result.createdSessionId,
                 });
 
                 router.push("/");
+                router.refresh();
+                return;
             }
+
+            if (result.status == "needs_second_factor") {
+                setNeedsSecondFactor(true);
+                return;
+            }
+
+            setError(`Sign in incomplete: ${result.status}`);
         } catch (err) {
             console.error(err);
             setError("Invalid email or password.");
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    async function handleSecondFactor(e: React.FormEvent) {
+        e.preventDefault();
+
+        if (!isLoaded) return;
+
+        try {
+            setLoading(true);
+            setError("");
+
+            const result = await signIn.attemptSecondFactor({
+                strategy: "totp",
+                code: secondFactorCode,
+            });
+
+            console.log("Second factor result:", result);
+
+            if (result.status === "complete" && result.createdSessionId) {
+                await setActive({ session: result.createdSessionId });
+                router.push("/");
+                router.refresh();
+                return;
+            }
+
+            setError(`Second factor incomplete: ${result.status}`);
+        } catch (err) {
+            console.error(err);
+            setError("Invalid verification code.");
         } finally {
             setLoading(false);
         }
@@ -97,47 +142,103 @@ export default function LoginPage() {
                             </p>
                         )}
 
-                        <form onSubmit={handleSubmit} className="mt-8 space-y-5">
-                            <div>
-                                <label className="text-sm text-zinc-400">
-                                    Email
-                                </label>
+                        {!needsSecondFactor ? (
+                            <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+                                <div>
+                                    <label className="text-sm text-zinc-400">
+                                        Email
+                                    </label>
 
-                                <input
-                                    name="email"
-                                    type="email"
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                    placeholder="FHermann@rbracing.com"
-                                    required
-                                    className="mt-2 w-full rounded-xl bg-zinc-900 border border-zinc-700 px-4 py-3 outline-none focus:border-red-500"
-                                />
-                            </div>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        placeholder="you@example.com"
+                                        required
+                                        className="mt-2 w-full rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 outline-none focus:border-red-500"
+                                    />
+                                </div>
 
-                            <div>
-                                <label className="text-sm text-zinc-400">
-                                    Password
-                                </label>
+                                <div>
+                                    <label className="text-sm text-zinc-400">
+                                        Password
+                                    </label>
 
-                                <input
-                                    name="password"
-                                    type="password"
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                    placeholder="••••••••"
-                                    required
-                                    className="mt-2 w-full rounded-xl bg-zinc-900 border border-zinc-700 px-4 py-3 outline-none focus:border-red-500"
-                                />
-                            </div>
+                                    <input
+                                        type="password"
+                                        name="password"
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                        placeholder="••••••••"
+                                        required
+                                        className="mt-2 w-full rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 outline-none focus:border-red-500"
+                                    />
+                                </div>
 
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="w-full rounded-xl bg-red-600 py-3 font-semibold text-white hover:bg-red-500 transition disabled:opacity-60"
+                                {error && (
+                                    <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+                                        {error}
+                                    </div>
+                                )}
+
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="w-full rounded-xl bg-red-600 py-3 font-semibold text-white transition hover:bg-red-500 disabled:opacity-60"
+                                >
+                                    {loading ? "Signing in..." : "Sign In"}
+                                </button>
+                            </form>
+                        ) : (
+                            <form
+                                onSubmit={handleSecondFactor}
+                                className="mt-8 space-y-5"
                             >
-                                {loading ? "Signing in..." : "Sign in"}
-                            </button>
-                        </form>
+                                <div>
+                                    <label className="text-sm text-zinc-400">
+                                        Verification code
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        value={secondFactorCode}
+                                        onChange={(e) =>
+                                            setSecondFactorCode(e.target.value)
+                                        }
+                                        placeholder="123456"
+                                        required
+                                        className="mt-2 w-full rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 outline-none focus:border-red-500"
+                                    />
+                                </div>
+
+                                {error && (
+                                    <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+                                        {error}
+                                    </div>
+                                )}
+
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="w-full rounded-xl bg-red-600 py-3 font-semibold text-white transition hover:bg-red-500 disabled:opacity-60"
+                                >
+                                    {loading ? "Verifying..." : "Verify code"}
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setNeedsSecondFactor(false);
+                                        setSecondFactorCode("");
+                                        setError("");
+                                    }}
+                                    className="w-full text-sm text-zinc-400 hover:text-white"
+                                >
+                                    Back to login
+                                </button>
+                            </form>
+                        )}
 
                         <div className="flex justify-center mt-6">
                             <Link

@@ -5,12 +5,6 @@ type ApiFetchOptions = RequestInit & {
     token?: string | null;
 };
 
-type RegisterPayload = {
-    name: string;
-    email: string;
-    password: string;
-};
-
 export async function apiFetch<T>(
     path: string,
     options: ApiFetchOptions = {}
@@ -36,9 +30,23 @@ export async function apiFetch<T>(
     return response.json();
 }
 
-export async function registerAccount(data: RegisterPayload) {
-    return apiFetch("/auth/register", {
+// export async function registerAccount(data: RegisterPayload) {
+//     return apiFetch("/auth/register", {
+//         method: "POST",
+//         body: JSON.stringify(data),
+//     });
+// }
+
+export async function syncAccount(token: string) {
+    return apiFetch("/auth/sync", {
         method: "POST",
-        body: JSON.stringify(data),
+        token,
+    });
+}
+
+export async function getMySetups(token: string) {
+    return apiFetch("/setups/mine", {
+        method: "GET",
+        token,
     });
 }

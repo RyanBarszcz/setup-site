@@ -248,13 +248,12 @@ async function main() {
 
     const demoUser = await prisma.user.upsert({
     where: {
-        authProviderId: "demo_clerk_user_1",
+        clerkId: "demo_clerk_user_1",
     },
     update: {},
     create: {
-        authProviderId: "demo_clerk_user_1",
+        clerkId: "demo_clerk_user_1",
         username: "apexhunter",
-        displayName: "Apex Hunter",
         email: "apexhunter@example.com",
         bio: "GT3 setup builder focused on stable race setups.",
     },

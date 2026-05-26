@@ -1,59 +1,56 @@
 import type { Request, Response } from "express";
-import { clerkClient } from "@clerk/express";
+import { clerkClient, getAuth } from "@clerk/express";
 import prisma from "../lib/prisma";
 
-export async function register(req: Request, res: Response) {
-    let clerkUserId: string | null = null;
-
+export async function syncAccount(
+    req: Request,
+    res: Response
+) {
     try {
-        const { name, email, password } = req.body;
+        const { userId } = getAuth(req);
 
-        if (!name || !email || !password) {
-            return res.status(400).json({
-                message: "Name, email, and password are required",
+        if (!userId) {
+            return res.status(401).json({
+                message: "Unauthorized",
             });
         }
 
-        const parts = name.trim().split(/\s+/);
-        const firstName = parts[0];
-        const lastName = parts.slice(1).join(" ");
+        const clerkUser =
+            await clerkClient.users.getUser(userId);
 
-        const clerkUser = await clerkClient.users.createUser({
-            emailAddress: [email],
-            password,
-            firstName,
-            lastName,
-            publicMetadata: {
-                role: "user",
+        const username =
+            clerkUser.username ||
+            `user_${userId.slice(-6)}`;
+
+        const email =
+            clerkUser.emailAddresses[0]?.emailAddress ||
+            "";
+
+        const user = await prisma.user.upsert({
+            where: {
+                clerkId: userId,
             },
-        });
-
-        clerkUserId = clerkUser.id;
-
-        const user = await prisma.user.create({
-            data: {
-                clerkId: clerkUser.id,
-                name,
+            update: {
+                username,
                 email,
+                imageUrl: clerkUser.imageUrl,
+            },
+            create: {
+                clerkId: userId,
+                username,
+                email,
+                imageUrl: clerkUser.imageUrl,
             },
         });
 
-        return res.status(201).json({
+        return res.status(200).json({
             user,
         });
     } catch (error) {
-        console.error("Register error:", error);
-
-        if (clerkUserId) {
-            try {
-                await clerkClient.users.deleteUser(clerkUserId);
-            } catch (rollbackError) {
-                console.error("Failed to rollback Clerk user:", rollbackError);
-            }
-        }
+        console.error("Sync account error:", error);
 
         return res.status(500).json({
-            message: "Failed to create account",
+            message: "Failed to sync account",
         });
     }
 }

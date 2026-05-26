@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../lib/prisma";
+import { getAuth } from "@clerk/express";
 
 export async function getSetups(req: Request, res: Response) {
     try {
@@ -115,6 +116,60 @@ export async function getSetups(req: Request, res: Response) {
 
         res.status(500).json({
             message: "Failed to fetch setups",
+        });
+    }
+}
+
+export async function getMySetups(req: Request, res: Response) {
+    try {
+        const { userId } = getAuth(req);
+
+
+        if (!userId) {
+            return res.status(401).json({
+                message: "Unauthorized",
+            });
+        }
+
+        const dbUser = await prisma.user.findUnique({
+            where: {
+                clerkId: userId,
+            },
+        });
+
+        if (!dbUser) {
+            return res.status(404).json({
+                message: "User not found",
+            });
+        }
+
+        const setups = await prisma.setup.findMany({
+            where: {
+                userId: dbUser.id,
+            },
+            orderBy: {
+                createdAt: "desc",
+            },
+            include: {
+                game: true,
+                track: true,
+                car: true,
+                tags: {
+                    include: {
+                        tag: true,
+                    },
+                },
+            },
+        });
+
+        res.json({
+            data: setups,
+        });
+    } catch (error) {
+        console.error(error);
+
+        res.status(500).json({
+            message: "Failed to fetch user setups",
         });
     }
 }
