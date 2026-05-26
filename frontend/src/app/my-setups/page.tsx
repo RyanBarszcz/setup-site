@@ -154,12 +154,13 @@ export default function MySetupsPage() {
                         </p>
                     </div>
 
-                    <Link
-                        href="/upload"
-                        className="rounded-full bg-red-600 px-7 py-3 text-sm font-semibold text-white transition hover:bg-red-500"
-                    >
-                        Upload Setup
-                    </Link>
+                    {setups.length !== 0 && (
+                        <Link
+                            href="/upload"
+                            className="rounded-full bg-red-600 px-7 py-3 text-sm font-semibold text-white transition hover:bg-red-500"
+                        >
+                            Upload Setup
+                        </Link>)}
                 </div>
 
                 {error && (
