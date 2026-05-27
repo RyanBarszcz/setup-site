@@ -130,7 +130,8 @@ model Setup {
   title          String
   description    String?
 
-  fileUrl        String
+  fileKey        String
+  fileUrl        String?
   fileName       String
   fileSize       Int?
   fileType       String?

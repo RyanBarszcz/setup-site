@@ -7,12 +7,13 @@ type Game = {
 };
 
 export default async function GameGrid() {
-    const games = await apiFetch<{ games: Game[] }>("/games");
-    console.log("games", games);
+    const response = await apiFetch<{ games: Game[] }>("/games");
+    const games = response.games;
+    // console.log("games", games);
 
     return (
         <div className="mt-8 grid grid-cols-5 gap-5">
-            {games.slice(0, 5).map((game, index) => (
+            {games.slice(0, 5).map((game: Game, index: number) => (
                 <GameCard
                     key={game.id}
                     id={game.id}

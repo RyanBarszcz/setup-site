@@ -49,7 +49,7 @@ export async function getTracks(req: Request, res: Response) {
             },
         });
 
-        res.json(tracks);
+        res.json({tracks});
     } catch (error) {
         console.error(error);
 

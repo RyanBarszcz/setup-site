@@ -7,9 +7,13 @@ export async function getGames(_req: Request, res: Response) {
             orderBy: {
                 name: "asc",
             },
+            select: {
+                id: true,
+                name: true,
+            }
         });
 
-        res.json(games);
+        res.json({games});
     } catch (error) {
         console.error(error);
 

@@ -15,17 +15,20 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1054.0",
     "@clerk/express": "^2.1.21",
     "@prisma/client": "^6.19.3",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "multer": "^2.1.1",
     "prisma": "^6.19.3",
     "svix": "^1.94.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/multer": "^2.1.0",
     "@types/node": "^25.9.1",
     "ts-node-dev": "^2.0.0",
     "typescript": "^6.0.3"

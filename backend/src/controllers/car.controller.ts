@@ -53,7 +53,7 @@ export async function getCars(req: Request, res: Response) {
             },
         });
 
-        res.json(cars);
+        res.json({cars});
     } catch (error) {
         console.error(error);
 

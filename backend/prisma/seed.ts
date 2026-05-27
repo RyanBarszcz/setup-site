@@ -311,6 +311,7 @@ const spaFerrariSetup = await prisma.setup.upsert({
         description:
             "Stable race setup for Spa focused on consistency, tire saving, and clean exits.",
         fileUrl: "https://example.com/setups/ferrari-296-spa-race.json",
+        fileKey: "demo/setups/ferrari_296_spa_race.json",
         fileName: "ferrari_296_spa_race.json",
         fileSize: 4200,
         fileType: "application/json",
@@ -341,6 +342,7 @@ const monzaPorscheSetup = await prisma.setup.upsert({
         description:
             "Low-drag Monza setup built around straight-line speed and stable braking.",
         fileUrl: "https://example.com/setups/porsche-911-monza-speed.json",
+        fileKey: "demo/setups/porsche_911_monza_speed.json",
         fileName: "porsche_911_monza_speed.json",
         fileSize: 3900,
         fileType: "application/json",
@@ -371,6 +373,7 @@ const watkinsMazdaSetup = await prisma.setup.upsert({
         description:
             "Beginner-friendly iRacing setup with predictable rotation and safe curb behavior.",
         fileUrl: "https://example.com/setups/mx5-watkins-beginner.sto",
+        fileKey: "demo/setups/mx5_watkins_beginner.sto",
         fileName: "mx5_watkins_beginner.sto",
         fileSize: 2800,
         fileType: "application/octet-stream",
