@@ -25,7 +25,7 @@ export default async function BrowseTracksPage({
                 <div className="flex items-end justify-between gap-8">
                     <div>
                         <p className="text-sm uppercase tracking-[0.3em] text-red-500">
-                            {params.gameId}
+                            {gameId}
                         </p>
 
                         <h1 className="mt-3 text-5xl font-bold tracking-tight">
@@ -51,7 +51,7 @@ export default async function BrowseTracksPage({
                         {tracks.map((track) => (
                             <Link
                                 key={track.id}
-                                href={`/browse/${params.gameId}/${track.id}`}
+                                href={`/browse/${gameId}/${track.id}`}
                                 className="group relative aspect-[16/10] overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-md transition hover:-translate-y-1 hover:border-red-500/50 hover:bg-white/10"
                             >
                                 {track.imageUrl && (
