@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { getMySetups } from "@/lib/api";
 
+// TODO: Work on the edit part
+
 type Setup = {
     id: string;
     title: string;

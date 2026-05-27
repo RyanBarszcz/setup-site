@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useClerk, useUser } from "@clerk/nextjs";
 
+// TODO: This should only search for user's/setup names
+
 export default function Navbar() {
     const { signOut } = useClerk();
     const { isSignedIn, user } = useUser();
