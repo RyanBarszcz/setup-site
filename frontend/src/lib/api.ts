@@ -8,11 +8,15 @@ type ApiFetchOptions = RequestInit & {
 export type GameOption = {
     id: string;
     name: string;
+    imageUrl?: string | null;
+    setupCount: number;
 };
 
 export type TrackOption = {
     id: string;
     name: string;
+    imageUrl?: string | null;
+    setupCount: number;
 };
 
 export type CarOption = {
@@ -56,6 +60,12 @@ export async function syncAccount(token: string) {
 
 export async function getGames() {
     return apiFetch<{ games: GameOption[] }>("/games", {
+        method: "GET",
+    });
+}
+
+export async function getPopularGames() {
+    return apiFetch<{ games: GameOption[] }>("/games/popular", {
         method: "GET",
     });
 }

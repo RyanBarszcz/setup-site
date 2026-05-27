@@ -46,14 +46,29 @@ export async function getTracks(req: Request, res: Response) {
                         game: true,
                     },
                 },
+                _count: {
+                    select: {
+                        setups: true,
+                    },
+                },
             },
         });
 
-        res.json({tracks});
-    } catch (error) {
-        console.error(error);
+        const formattedTracks = tracks.map((track) => ({
+            id: track.id,
+            name: track.name,
+            imageUrl: track.imageUrl,
+            setupCount: track._count.setups,
+            games: track.games,
+        }));
 
-        res.status(500).json({
+        return res.json({
+            tracks: formattedTracks,
+        });
+    } catch (error) {
+        console.error("Get tracks error:", error);
+
+        return res.status(500).json({
             message: "Failed to fetch tracks",
         });
     }
