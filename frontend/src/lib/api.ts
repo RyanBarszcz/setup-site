@@ -8,6 +8,7 @@ type ApiFetchOptions = RequestInit & {
 export type GameOption = {
     id: string;
     name: string;
+    slug: string;
     imageUrl?: string | null;
     setupCount: number;
 };
@@ -15,6 +16,7 @@ export type GameOption = {
 export type TrackOption = {
     id: string;
     name: string;
+    slug: string;
     imageUrl?: string | null;
     setupCount: number;
 };
@@ -22,6 +24,38 @@ export type TrackOption = {
 export type CarOption = {
     id: string;
     name: string;
+    slug: string;
+    imageUrl?: string | null;
+    manufacturer?: string | null;
+    class?: string | null;
+    setupCount: number;
+};
+
+export type SetupOption = {
+    id: string;
+    title: string;
+    description?: string | null;
+    downloadCount: number;
+    upvoteCount: number;
+    lapTimeMs?: number | null;
+    setupType: string;
+    weatherType: string;
+    createdAt: string;
+    game: GameOption;
+    track: TrackOption;
+    car: CarOption;
+    user: {
+        id: string;
+        username?: string | null;
+        imageUrl?: string | null;
+    };
+    tags: {
+        tag: {
+            id: string;
+            name: string;
+            slug: string;
+        };
+    }[];
 };
 
 export async function apiFetch<T>(
@@ -95,4 +129,44 @@ export async function createSetup(formData: FormData, token: string) {
         body: formData,
         token,
     });
+}
+
+export async function getGameBySlug(gameSlug: string) {
+    return apiFetch<{ game: GameOption }>(`/games/slug/${gameSlug}`, {
+        method: "GET",
+    });
+}
+
+export async function getTracksByGameSlug(gameSlug: string) {
+    return apiFetch<{ tracks: TrackOption[] }>(
+        `/tracks?gameSlug=${gameSlug}`,
+        {
+            method: "GET",
+        }
+    );
+}
+
+export async function getCarsByGameAndTrackSlug(
+    gameSlug: string,
+    trackSlug: string
+) {
+    return apiFetch<{ cars: CarOption[] }>(
+        `/cars?gameSlug=${gameSlug}&trackSlug=${trackSlug}`,
+        {
+            method: "GET",
+        }
+    );
+}
+
+export async function getSetupsBySlugs(
+    gameSlug: string,
+    trackSlug: string,
+    carSlug: string
+) {
+    return apiFetch<{ data: SetupOption[] }>(
+        `/setups?gameSlug=${gameSlug}&trackSlug=${trackSlug}&carSlug=${carSlug}`,
+        {
+            method: "GET",
+        }
+    );
 }

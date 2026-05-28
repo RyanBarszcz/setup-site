@@ -1,3 +1,5 @@
+import { getSetupsBySlugs } from "@/lib/api";
+
 const tags = [
     "Race",
     "Qualifying",
@@ -13,42 +15,20 @@ const tags = [
     "Controller Friendly",
 ];
 
-const setups = [
-    {
-        name: "Safe Race Setup",
-        description: "Stable setup focused on consistency over long stints.",
-        tags: ["Race", "Stable", "High Fuel"],
-        downloads: 1284,
-        rating: 4.8,
-        author: "Ryan",
-    },
-    {
-        name: "Aggressive Quali Setup",
-        description: "Sharper rotation and lower fuel for hotlap pace.",
-        tags: ["Qualifying", "Aggressive", "Low Fuel"],
-        downloads: 932,
-        rating: 4.6,
-        author: "PitCrew",
-    },
-    {
-        name: "Wet Endurance Setup",
-        description: "Soft balance for wet conditions and longer races.",
-        tags: ["Wet", "Endurance", "Stable"],
-        downloads: 721,
-        rating: 4.7,
-        author: "SetupLab",
-    },
-];
-
-export default function SetupResultsPage({
+export default async function SetupResultsPage({
     params,
 }: {
-    params: {
-        gameId: string;
-        trackId: string;
-        carId: string;
-    };
+    params: Promise<{
+        gameSlug: string;
+        trackSlug: string;
+        carSlug: string;
+    }>;
 }) {
+    const { gameSlug, trackSlug, carSlug } = await params;
+
+    const response = await getSetupsBySlugs(gameSlug, trackSlug, carSlug);
+    const setups = response.data;
+
     return (
         <main
             className="min-h-screen px-8 pt-28 text-white bg-cover bg-center bg-fixed"
@@ -61,7 +41,7 @@ export default function SetupResultsPage({
                 <div className="flex items-end justify-between gap-8">
                     <div>
                         <p className="text-sm uppercase tracking-[0.3em] text-red-500">
-                            {params.gameId} / {params.trackId} / {params.carId}
+                            {gameSlug} / {trackSlug} / {carSlug}
                         </p>
 
                         <h1 className="mt-3 text-5xl font-bold tracking-tight">
@@ -104,47 +84,42 @@ export default function SetupResultsPage({
                 <section className="mt-10 space-y-5">
                     {setups.map((setup) => (
                         <article
-                            key={setup.name}
+                            key={setup.id}
                             className="rounded-3xl border border-white/10 bg-black/35 p-5 backdrop-blur-md transition hover:border-red-500/40 hover:bg-black/50"
                         >
                             <div className="flex items-center justify-between gap-8">
                                 <div className="flex-1">
                                     <div className="flex items-center gap-3">
                                         <h2 className="text-xl font-semibold">
-                                            {setup.name}
+                                            {setup.title}
                                         </h2>
 
                                         <span className="rounded-full bg-red-500/15 px-3 py-1 text-xs text-red-400">
-                                            {setup.rating} ★
+                                            {setup.upvoteCount} upvotes
                                         </span>
                                     </div>
 
                                     <p className="mt-2 max-w-3xl text-sm text-white/55">
-                                        {setup.description}
+                                        {setup.description ||
+                                            "No description provided."}
                                     </p>
 
                                     <div className="mt-4 flex flex-wrap gap-2">
-                                        {setup.tags.slice(0, 3).map((tag) => (
+                                        {setup.tags.slice(0, 3).map((item) => (
                                             <span
-                                                key={tag}
+                                                key={item.tag.id}
                                                 className="rounded-full bg-white/10 px-3 py-1 text-xs text-white/70"
                                             >
-                                                {tag}
+                                                {item.tag.name}
                                             </span>
                                         ))}
-
-                                        {setup.tags.length > 3 && (
-                                            <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-white/40">
-                                                +{setup.tags.length - 3}
-                                            </span>
-                                        )}
                                     </div>
                                 </div>
 
                                 <div className="flex items-center gap-10">
                                     <div className="text-right">
                                         <p className="text-2xl font-bold">
-                                            {setup.downloads.toLocaleString()}
+                                            {setup.downloadCount.toLocaleString()}
                                         </p>
 
                                         <p className="text-xs uppercase tracking-[0.2em] text-white/40">
@@ -152,7 +127,8 @@ export default function SetupResultsPage({
                                         </p>
 
                                         <p className="mt-2 text-sm text-white/40">
-                                            by {setup.author}
+                                            by{" "}
+                                            {setup.user.username || "Unknown"}
                                         </p>
                                     </div>
 
@@ -163,6 +139,12 @@ export default function SetupResultsPage({
                             </div>
                         </article>
                     ))}
+
+                    {setups.length === 0 && (
+                        <div className="rounded-3xl border border-white/10 bg-white/5 p-8 text-white/60 backdrop-blur-md">
+                            No setups found for this car yet.
+                        </div>
+                    )}
                 </section>
             </div>
         </main>

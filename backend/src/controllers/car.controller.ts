@@ -3,18 +3,47 @@ import prisma from "../lib/prisma";
 
 export async function getCars(req: Request, res: Response) {
     try {
-        const { gameId, trackId, search } = req.query;
+        const { gameId, trackId, gameSlug, trackSlug, search } = req.query;
 
         const cars = await prisma.car.findMany({
             where: {
                 ...(gameId ? { gameId: String(gameId) } : {}),
 
-                ...(trackId
+                ...(gameSlug
+                    ? {
+                          game: {
+                              slug: String(gameSlug),
+                          },
+                      }
+                    : {}),
+
+                ...(trackId || trackSlug
                     ? {
                           setups: {
                               some: {
-                                  trackId: String(trackId),
-                                  ...(gameId ? { gameId: String(gameId) } : {}),
+                                  ...(trackId
+                                      ? { trackId: String(trackId) }
+                                      : {}),
+
+                                  ...(trackSlug
+                                      ? {
+                                            track: {
+                                                slug: String(trackSlug),
+                                            },
+                                        }
+                                      : {}),
+
+                                  ...(gameId
+                                      ? { gameId: String(gameId) }
+                                      : {}),
+
+                                  ...(gameSlug
+                                      ? {
+                                            game: {
+                                                slug: String(gameSlug),
+                                            },
+                                        }
+                                      : {}),
                               },
                           },
                       }
@@ -45,19 +74,60 @@ export async function getCars(req: Request, res: Response) {
                       }
                     : {}),
             },
+
             orderBy: {
                 name: "asc",
             },
+
             include: {
                 game: true,
+
+                setups: {
+                    where: {
+                        ...(gameId ? { gameId: String(gameId) } : {}),
+
+                        ...(gameSlug
+                            ? {
+                                  game: {
+                                      slug: String(gameSlug),
+                                  },
+                              }
+                            : {}),
+
+                        ...(trackId ? { trackId: String(trackId) } : {}),
+
+                        ...(trackSlug
+                            ? {
+                                  track: {
+                                      slug: String(trackSlug),
+                                  },
+                              }
+                            : {}),
+                    },
+                    select: {
+                        id: true,
+                    },
+                },
             },
         });
 
-        res.json({cars});
-    } catch (error) {
-        console.error(error);
+        const formattedCars = cars.map((car) => ({
+            id: car.id,
+            name: car.name,
+            slug: car.slug,
+            imageUrl: car.imageUrl,
+            manufacturer: car.manufacturer,
+            class: car.class,
+            setupCount: car.setups.length,
+        }));
 
-        res.status(500).json({
+        return res.json({
+            cars: formattedCars,
+        });
+    } catch (error) {
+        console.error("Get cars error:", error);
+
+        return res.status(500).json({
             message: "Failed to fetch cars",
         });
     }

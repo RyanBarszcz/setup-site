@@ -1,63 +1,64 @@
 import Link from "next/link";
-import { getTracksByGame } from "@/lib/api";
+import { getCarsByGameAndTrackSlug } from "@/lib/api";
 
-export default async function BrowseTracksPage({
+export default async function BrowseCarsPage({
     params,
 }: {
-    params: Promise<{ gameId: string }>;
+    params: Promise<{
+        gameSlug: string;
+        trackSlug: string;
+    }>;
 }) {
-    const { gameId } = await params;
-    // console.log("gameId param:", gameId);
+    const { gameSlug, trackSlug } = await params;
 
-    const response = await getTracksByGame(gameId);
-    const tracks = response.tracks;
-    // console.log("Tracks", tracks);
+    const response = await getCarsByGameAndTrackSlug(gameSlug, trackSlug);
+    const cars = response.cars;
 
     return (
         <main
             className="min-h-screen px-8 pt-28 text-white bg-cover bg-center bg-fixed"
             style={{
                 backgroundImage:
-                    "linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.75)), url('/backgrounds/track-bg.jpeg')",
+                    "linear-gradient(to bottom, rgba(0,0,0,0.76), rgba(0,0,0,0.94)), url('/backgrounds/car-bg.jpg')",
             }}
         >
             <div className="max-w-7xl mx-auto">
                 <div className="flex items-end justify-between gap-8">
                     <div>
                         <p className="text-sm uppercase tracking-[0.3em] text-red-500">
-                            {gameId}
+                            {gameSlug} / {trackSlug}
                         </p>
 
                         <h1 className="mt-3 text-5xl font-bold tracking-tight">
-                            Choose Track
+                            Choose Car
                         </h1>
 
                         <p className="mt-3 text-lg text-white/60">
-                            Select a circuit to view available cars and setups.
+                            Select a car to browse available community setups.
                         </p>
                     </div>
 
                     <input
                         type="text"
-                        placeholder="Search tracks..."
+                        placeholder="Search cars..."
                         className="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-white outline-none transition focus:border-white/20 focus:bg-white/10 backdrop-blur-md"
                     />
                 </div>
 
                 <section className="mt-12 pb-20">
-                    <h2 className="text-3xl font-semibold">Tracks</h2>
+                    <h2 className="text-3xl font-semibold">Cars</h2>
 
-                    <div className="mt-6 grid grid-cols-4 gap-5">
-                        {tracks.map((track) => (
+                    <div className="mt-6 grid grid-cols-5 gap-5">
+                        {cars.map((car) => (
                             <Link
-                                key={track.id}
-                                href={`/browse/${gameId}/${track.id}`}
+                                key={car.id}
+                                href={`/browse/${gameSlug}/${trackSlug}/${car.slug}`}
                                 className="group relative aspect-[16/10] overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-md transition hover:-translate-y-1 hover:border-red-500/50 hover:bg-white/10"
                             >
-                                {track.imageUrl && (
+                                {car.imageUrl && (
                                     <img
-                                        src={track.imageUrl}
-                                        alt={track.name}
+                                        src={car.imageUrl}
+                                        alt={car.name}
                                         className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
                                     />
                                 )}
@@ -66,16 +67,16 @@ export default async function BrowseTracksPage({
 
                                 <div className="absolute bottom-0 left-0 right-0 p-5">
                                     <p className="text-xs uppercase tracking-[0.25em] text-white/40">
-                                        Track
+                                        {car.class || "Car"}
                                     </p>
 
-                                    <h3 className="mt-1 text-xl font-semibold">
-                                        {track.name}
+                                    <h3 className="mt-1 text-lg font-semibold leading-tight">
+                                        {car.name}
                                     </h3>
 
                                     <p className="mt-1 text-sm text-white/50">
-                                        {track.setupCount}{" "}
-                                        {track.setupCount === 1
+                                        {car.setupCount}{" "}
+                                        {car.setupCount === 1
                                             ? "setup"
                                             : "setups"}
                                     </p>
@@ -84,9 +85,9 @@ export default async function BrowseTracksPage({
                         ))}
                     </div>
 
-                    {tracks.length === 0 && (
+                    {cars.length === 0 && (
                         <div className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-8 text-white/60 backdrop-blur-md">
-                            No tracks found for this game yet.
+                            No cars found for this game and track yet.
                         </div>
                     )}
                 </section>

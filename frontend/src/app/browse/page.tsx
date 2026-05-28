@@ -53,7 +53,7 @@ export default async function BrowseGamesPage() {
                             {popularGames.map((game) => (
                                 <Link
                                     key={game.id}
-                                    href={`/browse/${game.id}`}
+                                    href={`/browse/${game.slug}`}
                                     className="group relative h-[240px] overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-md"
                                 >
                                     {game.imageUrl && (
@@ -91,7 +91,7 @@ export default async function BrowseGamesPage() {
                         {games.map((game) => (
                             <Link
                                 key={game.id}
-                                href={`/browse/${game.id}`}
+                                href={`/browse/${game.slug}`}
                                 className="group relative aspect-[16/10] overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md"
                             >
                                 {game.imageUrl && (

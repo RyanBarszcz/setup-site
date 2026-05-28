@@ -3,7 +3,7 @@ import prisma from "../lib/prisma";
 
 export async function getTracks(req: Request, res: Response) {
     try {
-        const { gameId, carId, search } = req.query;
+        const { gameId, gameSlug, carId, search } = req.query;
 
         const tracks = await prisma.track.findMany({
             where: {
@@ -17,12 +17,31 @@ export async function getTracks(req: Request, res: Response) {
                       }
                     : {}),
 
+                ...(gameSlug
+                    ? {
+                          games: {
+                              some: {
+                                  game: {
+                                      slug: String(gameSlug),
+                                  },
+                              },
+                          },
+                      }
+                    : {}),
+
                 ...(carId
                     ? {
                           setups: {
                               some: {
                                   carId: String(carId),
                                   ...(gameId ? { gameId: String(gameId) } : {}),
+                                  ...(gameSlug
+                                      ? {
+                                            game: {
+                                                slug: String(gameSlug),
+                                            },
+                                        }
+                                      : {}),
                               },
                           },
                       }
@@ -37,18 +56,31 @@ export async function getTracks(req: Request, res: Response) {
                       }
                     : {}),
             },
+
             orderBy: {
                 name: "asc",
             },
+
             include: {
                 games: {
                     include: {
                         game: true,
                     },
                 },
-                _count: {
+
+                setups: {
+                    where: {
+                        ...(gameId ? { gameId: String(gameId) } : {}),
+                        ...(gameSlug
+                            ? {
+                                  game: {
+                                      slug: String(gameSlug),
+                                  },
+                              }
+                            : {}),
+                    },
                     select: {
-                        setups: true,
+                        id: true,
                     },
                 },
             },
@@ -57,8 +89,9 @@ export async function getTracks(req: Request, res: Response) {
         const formattedTracks = tracks.map((track) => ({
             id: track.id,
             name: track.name,
+            slug: track.slug,
             imageUrl: track.imageUrl,
-            setupCount: track._count.setups,
+            setupCount: track.setups.length,
             games: track.games,
         }));
 

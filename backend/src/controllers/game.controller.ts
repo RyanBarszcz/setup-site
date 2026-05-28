@@ -19,6 +19,7 @@ export async function getGames(_req: Request, res: Response) {
         const formattedGames = games.map((game) => ({
             id: game.id,
             name: game.name,
+            slug: game.slug,
             imageUrl: game.imageUrl,
             setupCount: game._count.setups,
         }));
@@ -55,6 +56,7 @@ export async function getPopularGames(
             .map((game) => ({
                 id: game.id,
                 name: game.name,
+                slug: game.slug,
                 imageUrl: game.imageUrl,
                 setupCount: game._count.setups,
             }));
@@ -67,6 +69,47 @@ export async function getPopularGames(
 
         return res.status(500).json({
             message: "Failed to fetch popular games",
+        });
+    }
+}
+
+export async function getGameBySlug(req: Request, res: Response) {
+    try {
+        const { slug } = req.params;
+
+        const game = await prisma.game.findUnique({
+            where: {
+                slug,
+            },
+            include: {
+                _count: {
+                    select: {
+                        setups: true,
+                    },
+                },
+            },
+        });
+
+        if (!game) {
+            return res.status(404).json({
+                message: "Game not found",
+            });
+        }
+
+        return res.json({
+            game: {
+                id: game.id,
+                name: game.name,
+                slug: game.slug,
+                imageUrl: game.imageUrl,
+                setupCount: game._count.setups,
+            },
+        });
+    } catch (error) {
+        console.error("Get game by slug error:", error);
+
+        return res.status(500).json({
+            message: "Failed to fetch game",
         });
     }
 }

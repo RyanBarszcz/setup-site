@@ -10,6 +10,9 @@ export async function getSetups(req: Request, res: Response) {
             gameId,
             trackId,
             carId,
+            gameSlug,
+            trackSlug,
+            carSlug,
             setupType,
             weatherType,
             tags,
@@ -55,11 +58,38 @@ export async function getSetups(req: Request, res: Response) {
                       ],
                   }
                 : {}),
+
             ...(gameId ? { gameId: String(gameId) } : {}),
             ...(trackId ? { trackId: String(trackId) } : {}),
             ...(carId ? { carId: String(carId) } : {}),
+
+            ...(gameSlug
+                ? {
+                      game: {
+                          slug: String(gameSlug),
+                      },
+                  }
+                : {}),
+
+            ...(trackSlug
+                ? {
+                      track: {
+                          slug: String(trackSlug),
+                      },
+                  }
+                : {}),
+
+            ...(carSlug
+                ? {
+                      car: {
+                          slug: String(carSlug),
+                      },
+                  }
+                : {}),
+
             ...(setupType ? { setupType: String(setupType) as any } : {}),
             ...(weatherType ? { weatherType: String(weatherType) as any } : {}),
+
             ...(tagSlugs.length > 0
                 ? {
                       tags: {
@@ -89,7 +119,6 @@ export async function getSetups(req: Request, res: Response) {
                         select: {
                             id: true,
                             username: true,
-                            displayName: true,
                             imageUrl: true,
                         },
                     },
@@ -100,10 +129,13 @@ export async function getSetups(req: Request, res: Response) {
                     },
                 },
             }),
-            prisma.setup.count({ where }),
+
+            prisma.setup.count({
+                where,
+            }),
         ]);
 
-        res.json({
+        return res.json({
             data: setups,
             pagination: {
                 page: pageNumber,
@@ -113,9 +145,9 @@ export async function getSetups(req: Request, res: Response) {
             },
         });
     } catch (error) {
-        console.error(error);
+        console.error("Get setups error:", error);
 
-        res.status(500).json({
+        return res.status(500).json({
             message: "Failed to fetch setups",
         });
     }
