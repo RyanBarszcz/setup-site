@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { searchUsers } from "../controllers/user.controller";
+import { searchUsers, getUserProfile } from "../controllers/user.controller";
 
 const router = Router();
 
 router.get("/search", searchUsers);
+router.get("/profile/:username", getUserProfile);
 
 export default router;

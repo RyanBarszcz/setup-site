@@ -67,7 +67,7 @@ export default function Navbar() {
         <header className="fixed top-0 z-50 w-full border-b border-white/10 bg-black/30 backdrop-blur-2xl">
             <div className="mx-auto flex h-20 max-w-[1800px] items-center justify-between px-12">
                 <Link href="/" className="text-3xl font-black italic tracking-tight">
-                    SETUPS<span className="text-red-600">RUS</span>
+                    SETUPS<span className="text-red-600">R</span>US
                 </Link>
 
                 <div className="hidden gap-10 text-sm uppercase tracking-wide text-zinc-300 lg:flex">
