@@ -3,7 +3,6 @@ import { getGames, getPopularGames } from "@/lib/api";
 import GameSearchClient from "./GameSearchClient";
 
 // TODO: Work on images for each
-// TODO: Work on search and if searching change how page looks
 // TODO: Work on loading pages/skeleton loaders
 
 export default async function BrowseGamesPage() {
