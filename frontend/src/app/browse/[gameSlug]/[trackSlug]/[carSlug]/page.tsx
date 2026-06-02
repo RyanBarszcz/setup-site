@@ -1,4 +1,5 @@
 import { getSetupsBySlugs } from "@/lib/api";
+import { Download } from "lucide-react";
 
 const tags = [
     "Race",
@@ -34,7 +35,7 @@ export default async function SetupResultsPage({
             className="min-h-screen px-8 pt-28 text-white bg-cover bg-center bg-fixed"
             style={{
                 backgroundImage:
-                    "linear-gradient(to bottom, rgba(0,0,0,0.78), rgba(0,0,0,0.95)), url('/backgrounds/browse-bg.jpg')",
+                    "linear-gradient(to bottom, rgba(0,0,0,0.78), rgba(0,0,0,0.95)), url('/backgrounds/upload-bg.jpg')",
             }}
         >
             <div className="max-w-7xl mx-auto pb-20">
@@ -132,8 +133,10 @@ export default async function SetupResultsPage({
                                         </p>
                                     </div>
 
-                                    <button className="rounded-full bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-red-500">
-                                        View Setup
+                                    {/* TODO: Make button work */}
+                                    <button className="flex items-center gap-2 rounded-full bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-red-500">
+                                        <Download size={16} />
+                                        Download Setup
                                     </button>
                                 </div>
                             </div>

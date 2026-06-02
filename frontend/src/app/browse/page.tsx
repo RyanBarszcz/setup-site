@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { getGames, getPopularGames } from "@/lib/api";
 
-// TODO: Work on game images
+// TODO: Work on images for each
 // TODO: Work on search and if searching change how page looks
+// TODO: Work on loading pages/skeleton loaders
 
 export default async function BrowseGamesPage() {
     const [gamesResponse, popularGamesResponse] = await Promise.all([
