@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useClerk, useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 
-// TODO: This should only search for users
+// TODO: Make profile be clickable and be able to option a users profile so they can edit info
 
 export default function Navbar() {
     const { signOut } = useClerk();

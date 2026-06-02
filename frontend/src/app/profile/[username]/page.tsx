@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ProfileSetupsClient from "./ProfileSetupsClient";
 
 type ProfileUser = {
     id: string;
@@ -93,37 +94,7 @@ export default async function ProfilePage({
                     </div>
                 </div>
 
-                <div className="mt-10">
-                    <h2 className="text-2xl font-bold">Setups</h2>
-                    {/* TODO: Later add search */}
-                    {setups.length === 0 ? (
-                        <div className="mt-6 rounded-3xl border border-white/10 bg-white/[0.03] p-8 text-zinc-400">
-                            This driver has not uploaded any setups yet.
-                        </div>
-                    ) : (
-                        <div className="mt-6 grid grid-cols-3 gap-5">
-                            {setups.map((setup) => (
-                                <Link
-                                    key={setup.id}
-                                    href={`/setups/${setup.id}`}
-                                    className="rounded-3xl border border-white/10 bg-zinc-950 p-6 transition hover:border-red-500/50 hover:bg-zinc-900"
-                                >
-                                    <h3 className="text-lg font-bold">{setup.title}</h3>
-
-                                    <p className="mt-2 line-clamp-2 text-sm text-zinc-400">
-                                        {setup.description || "No description provided."}
-                                    </p>
-
-                                    <div className="mt-5 space-y-1 text-sm text-zinc-500">
-                                        <p>{setup.game.name}</p>
-                                        <p>{setup.car.name}</p>
-                                        <p>{setup.track.name}</p>
-                                    </div>
-                                </Link>
-                            ))}
-                        </div>
-                    )}
-                </div>
+                <ProfileSetupsClient setups={setups} />
             </section>
         </main>
     );
