@@ -7,6 +7,7 @@ import carRoutes from "./routes/car.routes";
 import tagRoutes from "./routes/tag.routes";
 import setupRoutes from "./routes/setup.routes";
 import authRoutes from "./routes/auth.routes";
+import userRoutes from "./routes/user.routes";
 import { clerkMiddleware } from "@clerk/express";
 
 const app = express();
@@ -27,5 +28,6 @@ app.use("/cars", carRoutes);
 app.use("/tags", tagRoutes);
 app.use("/setups", setupRoutes);
 app.use("/auth", authRoutes);
+app.use("/users", userRoutes);
 
 export default app;
