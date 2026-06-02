@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getGames, getPopularGames } from "@/lib/api";
+import GameSearchClient from "./GameSearchClient";
 
 // TODO: Work on images for each
 // TODO: Work on search and if searching change how page looks
@@ -34,12 +35,6 @@ export default async function BrowseGamesPage() {
                             racing games.
                         </p>
                     </div>
-
-                    <input
-                        type="text"
-                        placeholder="Search games..."
-                        className="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-white outline-none transition focus:border-white/20 focus:bg-white/10 backdrop-blur-md"
-                    />
                 </div>
 
                 {popularGames.length > 0 && (
@@ -86,40 +81,7 @@ export default async function BrowseGamesPage() {
                 )}
 
                 <section className="mt-20 pb-20">
-                    <h2 className="text-3xl font-semibold">All Games</h2>
-
-                    <div className="mt-6 grid grid-cols-5 gap-5">
-                        {games.map((game) => (
-                            <Link
-                                key={game.id}
-                                href={`/browse/${game.slug}`}
-                                className="group relative aspect-[16/10] overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md"
-                            >
-                                {game.imageUrl && (
-                                    <img
-                                        src={game.imageUrl}
-                                        alt={game.name}
-                                        className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                                    />
-                                )}
-
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent" />
-
-                                <div className="absolute bottom-0 left-0 right-0 p-4">
-                                    <h3 className="font-semibold">
-                                        {game.name}
-                                    </h3>
-
-                                    <p className="mt-1 text-xs text-white/55">
-                                        {game.setupCount}{" "}
-                                        {game.setupCount === 1
-                                            ? "Setup"
-                                            : "Setups"}
-                                    </p>
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
+                    <GameSearchClient games={games} />
                 </section>
             </div>
         </main>
