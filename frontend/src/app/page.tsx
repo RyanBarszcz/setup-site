@@ -3,6 +3,8 @@ import HeroSection from "@/components/landing/HeroSection";
 import GameGrid from "@/components/landing/GameGrid";
 import FeatureStrip from "@/components/landing/FeatureStrip";
 
+// TODO: Work on rating system
+
 export default function Home() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-black text-white">
@@ -10,7 +12,7 @@ export default function Home() {
       {/* Background Image */}
       <div className="fixed inset-0">
         <img
-          src="/hero.jpg"
+          src="/hero3.jpg"
           alt="Background"
           className="h-full w-full object-cover"
         />

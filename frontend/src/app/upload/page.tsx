@@ -25,6 +25,9 @@ const setupTags = [
     "Endurance",
 ];
 
+// TODO: Work on requests
+// TODO: Later add manufacturer then model
+
 export default function UploadSetupPage() {
     const { getToken } = useAuth();
 
@@ -230,7 +233,7 @@ export default function UploadSetupPage() {
                                 name="gameId"
                                 value={formData.gameId}
                                 onChange={handleChange}
-                                className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none"
+                                className="mt-2 w-full rounded-2xl border border-white/10 bg-zinc-950 px-4 py-3 text-white outline-none"
                             >
                                 <option value="">Select game</option>
                                 {games.map((game) => (
@@ -251,7 +254,7 @@ export default function UploadSetupPage() {
                                 value={formData.trackId}
                                 onChange={handleChange}
                                 disabled={!formData.gameId || isLoadingOptions}
-                                className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                                className="mt-2 w-full rounded-2xl border border-white/10 bg-zinc-950 px-4 py-3 text-white outline-none disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 <option value="">
                                     {!formData.gameId ? "Select game first" : "Select track"}
@@ -285,7 +288,7 @@ export default function UploadSetupPage() {
                                 value={formData.carId}
                                 onChange={handleChange}
                                 disabled={!formData.gameId || isLoadingOptions}
-                                className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                                className="mt-2 w-full rounded-2xl border border-white/10 bg-zinc-950 px-4 py-3 text-white outline-none disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 <option value="">
                                     {!formData.gameId ? "Select game first" : "Select car"}

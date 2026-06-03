@@ -3,6 +3,14 @@ import prisma from "../lib/prisma";
 import { getAuth } from "@clerk/express";
 import { deleteSetupFileFromS3, uploadSetupFileToS3 } from "../lib/s3";
 
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)+/g, "");
+}
+
 export async function getSetups(req: Request, res: Response) {
     try {
         const {
@@ -336,4 +344,139 @@ export async function createSetup(req: Request, res: Response) {
             message: "Failed to create setup",
         });
     }
+}
+
+export async function getSetupForEdit(req: Request, res: Response) {
+  const setupId = String(req.params.setupId);
+  const dbUser = (req as any).dbUser;
+  const userId = dbUser?.id;
+
+  const setup = await prisma.setup.findUnique({
+    where: { id: setupId },
+    include: {
+      tags: {
+        include: {
+          tag: true,
+        },
+      },
+    },
+  });
+
+  if (!setup) {
+    return res.status(404).json({ message: "Setup not found" });
+  }
+
+  if (setup.userId !== userId) {
+    return res.status(403).json({ message: "Not allowed to edit this setup" });
+  }
+
+  res.json({
+    setup: {
+      ...setup,
+      tags: setup.tags.map((item) => item.tag.name),
+    },
+  });
+}
+
+export async function updateSetup(req: Request, res: Response) {
+  const setupId = String(req.params.setupId);
+  const dbUser = (req as any).dbUser;
+  const userId = dbUser?.id;
+
+  const existingSetup = await prisma.setup.findUnique({
+    where: { id: setupId },
+  });
+
+  if (!existingSetup) {
+    return res.status(404).json({ message: "Setup not found" });
+  }
+
+  if (existingSetup.userId !== userId) {
+    return res.status(403).json({ message: "Not allowed to edit this setup" });
+  }
+
+  const {
+    gameId,
+    trackId,
+    carId,
+    title,
+    setupType,
+    weatherType,
+    visibility,
+    trackCondition,
+    temperatureF,
+    lapTimeMs,
+    fuelLoad,
+    tireCompound,
+    description,
+    tags,
+  } = req.body;
+
+  const parsedTags: string[] = tags ? JSON.parse(tags) : [];
+
+  const updatedSetup = await prisma.$transaction(async (tx) => {
+    await tx.setupTag.deleteMany({
+      where: {
+        setupId,
+      },
+    });
+
+    const updated = await tx.setup.update({
+      where: {
+        id: setupId,
+      },
+      data: {
+        gameId,
+        trackId,
+        carId,
+        title,
+        setupType,
+        weatherType,
+        visibility,
+        trackCondition: trackCondition || null,
+        temperatureF: temperatureF ? Number(temperatureF) : null,
+        lapTimeMs: lapTimeMs ? Number(lapTimeMs) : null,
+        fuelLoad: fuelLoad || null,
+        tireCompound: tireCompound || null,
+        description: description || null,
+
+        // only update file if user uploads a new one
+        ...(req.file
+          ? {
+              fileName: req.file.originalname,
+              fileSize: req.file.size,
+              fileMimeType: req.file.mimetype,
+              // fileUrl: uploadedUrlFromS3,
+            }
+          : {}),
+      },
+    });
+
+    for (const tagName of parsedTags) {
+      const tag = await tx.tag.upsert({
+        where: {
+          name: tagName,
+        },
+        update: {},
+        create: {
+          name: tagName,
+          slug: slugify(tagName),
+        },
+      });
+
+      await tx.setupTag.create({
+        data: {
+          setupId,
+          tagId: tag.id,
+        },
+      });
+    }
+
+    return updated;
+  });
+
+  res.json({
+    message: "Setup updated successfully",
+    setup: updatedSetup,
+  });
 }

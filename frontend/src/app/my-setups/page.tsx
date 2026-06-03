@@ -5,8 +5,6 @@ import { useEffect, useState } from "react";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { getMySetups } from "@/lib/api";
 
-// TODO: Work on the edit part
-
 type Setup = {
     id: string;
     title: string;
@@ -269,9 +267,12 @@ export default function MySetupsPage() {
                                             </p>
                                         </div>
 
-                                        <button className="rounded-full border border-white/10 px-5 py-2.5 text-sm font-semibold text-white/70 transition hover:bg-white/10 hover:text-white">
+                                        <Link
+                                            href={`/setups/${setup.id}/edit`}
+                                            className="rounded-full border border-white/10 px-5 py-2.5 text-sm font-semibold text-white/70 transition hover:bg-white/10 hover:text-white"
+                                        >
                                             Edit
-                                        </button>
+                                        </Link>
                                     </div>
                                 </div>
                             </article>

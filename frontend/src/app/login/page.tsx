@@ -176,12 +176,6 @@ export default function LoginPage() {
                                     />
                                 </div>
 
-                                {error && (
-                                    <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
-                                        {error}
-                                    </div>
-                                )}
-
                                 <button
                                     type="submit"
                                     disabled={loading}
@@ -256,7 +250,7 @@ export default function LoginPage() {
                                     href="/sign-up"
                                     className="text-red-400 hover:text-red-300"
                                 >
-                                    Create one
+                                    Create Account
                                 </Link>
                             </p>
                         </div>

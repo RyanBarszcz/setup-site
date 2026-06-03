@@ -58,6 +58,25 @@ export type SetupOption = {
     }[];
 };
 
+export type SetupEditOption = {
+    id: string;
+    gameId: string;
+    trackId: string;
+    carId: string;
+    title: string;
+    description?: string | null;
+    setupType: string;
+    weatherType: string;
+    visibility: string;
+    trackCondition?: string | null;
+    temperatureF?: number | null;
+    lapTimeMs?: number | null;
+    fuelLoad?: string | null;
+    tireCompound?: string | null;
+    fileName?: string | null;
+    tags: string[];
+};
+
 export async function apiFetch<T>(
     path: string,
     options: ApiFetchOptions = {}
@@ -167,6 +186,31 @@ export async function getSetupsBySlugs(
         `/setups?gameSlug=${gameSlug}&trackSlug=${trackSlug}&carSlug=${carSlug}`,
         {
             method: "GET",
+        }
+    );
+}
+
+export async function getSetupForEdit(setupId: string, token: string) {
+    return apiFetch<{ setup: SetupEditOption & { fileName?: string | null } }>(
+        `/setups/${setupId}/edit`,
+        {
+            method: "GET",
+            token,
+        }
+    );
+}
+
+export async function updateSetup(
+    setupId: string,
+    data: FormData,
+    token: string
+) {
+    return apiFetch<{ message: string; setup: SetupEditOption }>(
+        `/setups/${setupId}`,
+        {
+            method: "PATCH",
+            body: data,
+            token,
         }
     );
 }

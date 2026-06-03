@@ -12,6 +12,8 @@ import { clerkMiddleware } from "@clerk/express";
 
 const app = express();
 
+// TODO: JWT Specific routes 
+
 app.use(clerkMiddleware());
 app.use(cors());
 app.use(express.json());
