@@ -17,10 +17,10 @@ export default function HeroSection() {
                     <p className="border-l-4 border-red-600 pl-4 text-lg font-bold uppercase text-zinc-100">
                         Choose your game
                     </p>
-
+                    {/* 
                     <p className="mt-3 text-sm text-zinc-400">
                         Select a game to browse setups
-                    </p>
+                    </p> */}
                 </div>
             </div>
         </section>

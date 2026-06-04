@@ -27,6 +27,7 @@ const setupTags = [
 
 // TODO: Work on requests
 // TODO: Later add manufacturer then model
+// TODO: Make boxes look like the one from final browse
 
 export default function UploadSetupPage() {
     const { getToken } = useAuth();

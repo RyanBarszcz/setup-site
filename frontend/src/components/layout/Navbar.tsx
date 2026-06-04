@@ -21,10 +21,7 @@ export default function Navbar() {
         await signOut();
     }
 
-    const initial =
-        user?.firstName?.[0] ||
-        user?.emailAddresses?.[0]?.emailAddress?.[0] ||
-        "R";
+    const initial = user?.username?.[0] || "U";
 
     const [search, setSearch] = useState("");
     const [results, setResults] = useState<UserResult[]>([]);

@@ -3,7 +3,7 @@ import HeroSection from "@/components/landing/HeroSection";
 import GameGrid from "@/components/landing/GameGrid";
 import FeatureStrip from "@/components/landing/FeatureStrip";
 
-// TODO: Work on rating system
+// TODO: Make setups clickable and have their own page or when you click on it make it a modal that is large
 
 export default function Home() {
   return (
@@ -12,13 +12,13 @@ export default function Home() {
       {/* Background Image */}
       <div className="fixed inset-0">
         <img
-          src="/hero3.jpg"
+          src="/hero4.jpg"
           alt="Background"
           className="h-full w-full object-cover"
         />
 
         {/* Dark overlay */}
-        <div className="fixed inset-0 bg-black/25" />
+        <div className="fixed inset-0 bg-black/10" />
 
         {/* Red cinematic glow */}
         <div className="fixed inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(255, 255, 255, 0.28),transparent_40%)]" />

@@ -53,7 +53,7 @@ export default function GameCard({
                         </p>
                     </div>
 
-                    <div className="text-right">
+                    {/* <div className="text-right">
                         <p className="text-xl font-black text-white">
                             {15231 - index * 2500}
                         </p>
@@ -61,7 +61,7 @@ export default function GameCard({
                         <p className="text-[11px] uppercase tracking-[0.25em] text-zinc-400">
                             Drivers
                         </p>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </Link>
