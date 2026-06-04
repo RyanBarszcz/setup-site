@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Download, ThumbsUp } from "lucide-react";
+import { ChevronDown, Download, ThumbsUp } from "lucide-react";
 import { toggleVote } from "@/lib/api";
 import { useAuth } from "@clerk/nextjs";
 
@@ -28,6 +28,7 @@ type Setup = {
     description?: string | null;
     downloadCount: number;
     upvoteCount: number;
+    createdAt: string;
     hasUpvoted: boolean;
     isOwner: boolean,
     user: {
@@ -105,9 +106,15 @@ export default function SetupResultsClient({ setups }: { setups: Setup[] }) {
         });
 
         result = [...result].sort((a, b) => {
-            if (sort === "Highest Rated") return b.upvoteCount - a.upvoteCount;
-            if (sort === "Newest") return 0;
-            if (sort === "Oldest") return 0;
+            if (sort === "Highest Rated") {
+                return b.upvoteCount - a.upvoteCount;
+            }
+            if (sort === "Newest") {
+                return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+            }
+            if (sort === "Oldest") {
+                return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+            }
 
             return b.downloadCount - a.downloadCount;
         });
@@ -126,16 +133,23 @@ export default function SetupResultsClient({ setups }: { setups: Setup[] }) {
                     className="w-full rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-white outline-none transition placeholder:text-white/40 focus:border-white/20 focus:bg-white/10 backdrop-blur-md"
                 />
 
-                <select
-                    value={sort}
-                    onChange={(e) => setSort(e.target.value)}
-                    className="rounded-2xl border border-white/10 bg-zinc-950 px-5 py-4 text-white outline-none backdrop-blur-md"
-                >
-                    <option>Most Downloads</option>
-                    <option>Highest Rated</option>
-                    <option>Newest</option>
-                    <option>Oldest</option>
-                </select>
+                <div className="relative">
+                    <select
+                        value={sort}
+                        onChange={(e) => setSort(e.target.value)}
+                        className="appearance-none rounded-2xl border border-white/10 bg-zinc-950 px-5 pr-12 py-4 text-white outline-none transition hover:border-red-500/30 focus:border-red-500/50 backdrop-blur-md hover:cursor-pointer"
+                    >
+                        <option>Most Downloads</option>
+                        <option>Most Upvoted</option>
+                        <option>Newest</option>
+                        <option>Oldest</option>
+                    </select>
+
+                    <ChevronDown
+                        size={18}
+                        className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-white/40"
+                    />
+                </div>
             </div>
 
             <div className="mt-6 flex flex-wrap gap-3">
@@ -171,8 +185,10 @@ export default function SetupResultsClient({ setups }: { setups: Setup[] }) {
                                     </h2>
 
                                     {setup.isOwner ? (
-                                        <div className="rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-400">
-                                            Your Setup
+                                        <div className="flex items-center gap-2 rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-400">
+                                            <span>Your Setup</span>
+                                            <ThumbsUp size={14} />
+                                            <span className="opacity-80">{setup.upvoteCount}</span>
                                         </div>
                                     ) : (
                                         <button
