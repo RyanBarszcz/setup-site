@@ -35,3 +35,34 @@ export async function attachUser(
         res.status(500).json({ message: "Failed to attach user" });
     }
 }
+
+export async function attachUserOptional(
+    req: Request,
+    _res: Response,
+    next: NextFunction
+) {
+    try {
+        const auth = (req as any).auth();
+
+        if (!auth?.userId) {
+            return next();
+        }
+
+        const dbUser = await prisma.user.findUnique({
+            where: {
+                clerkId: auth.userId,
+            },
+        });
+
+        if (dbUser) {
+            (req as any).dbUser = dbUser;
+        }
+
+        // console.log("Attached DB user:", dbUser?.id);
+
+        next();
+    } catch (error) {
+        console.error(error);
+        next();
+    }
+}

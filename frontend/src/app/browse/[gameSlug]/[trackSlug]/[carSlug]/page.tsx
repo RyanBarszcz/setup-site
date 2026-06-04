@@ -1,5 +1,6 @@
 import { getSetupsBySlugs } from "@/lib/api";
 import SetupResultsClient from "./SetupResultsClient";
+import { auth } from "@clerk/nextjs/server";
 
 export default async function SetupResultsPage({
     params,
@@ -12,7 +13,16 @@ export default async function SetupResultsPage({
 }) {
     const { gameSlug, trackSlug, carSlug } = await params;
 
-    const response = await getSetupsBySlugs(gameSlug, trackSlug, carSlug);
+    const { getToken } = await auth();
+    const token = await getToken();
+
+    const response = await getSetupsBySlugs(
+        gameSlug,
+        trackSlug,
+        carSlug,
+        token
+    );
+
     const setups = response.data;
 
     return (
@@ -41,6 +51,7 @@ export default async function SetupResultsPage({
                     </div>
                 </div>
 
+                {/* TODO: Fix types */}
                 <div className="mt-8">
                     <SetupResultsClient setups={setups} />
                 </div>

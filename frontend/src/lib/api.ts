@@ -180,12 +180,14 @@ export async function getCarsByGameAndTrackSlug(
 export async function getSetupsBySlugs(
     gameSlug: string,
     trackSlug: string,
-    carSlug: string
+    carSlug: string,
+    token?: string | null
 ) {
     return apiFetch<{ data: SetupOption[] }>(
         `/setups?gameSlug=${gameSlug}&trackSlug=${trackSlug}&carSlug=${carSlug}`,
         {
             method: "GET",
+            token: token ?? undefined,
         }
     );
 }
@@ -213,4 +215,17 @@ export async function updateSetup(
             token,
         }
     );
+}
+
+export async function toggleVote(
+    setupId: string,
+    token: string
+) {
+    return apiFetch<{
+        hasUpvoted: boolean;
+        upvoteCount: number;
+    }>(`/setups/${setupId}/vote`, {
+        method: "POST",
+        token,
+    });
 }

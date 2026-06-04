@@ -13,6 +13,9 @@ function slugify(value: string) {
 
 export async function getSetups(req: Request, res: Response) {
     try {
+        const dbUser = (req as any).dbUser;
+        const userId = dbUser?.id;
+
         const {
             search,
             gameId,
@@ -135,6 +138,16 @@ export async function getSetups(req: Request, res: Response) {
                             tag: true,
                         },
                     },
+                    votes: userId
+                        ? {
+                              where: {
+                                  userId,
+                              },
+                              select: {
+                                  id: true,
+                              },
+                          }
+                        : false,
                 },
             }),
 
@@ -144,7 +157,12 @@ export async function getSetups(req: Request, res: Response) {
         ]);
 
         return res.json({
-            data: setups,
+            data: setups.map((setup) => ({
+                ...setup,
+                hasUpvoted: userId ? setup.votes.length > 0 : false,
+                isOwner: userId ? setup.userId === userId : false,
+                votes: undefined,
+            })),
             pagination: {
                 page: pageNumber,
                 limit: limitNumber,
@@ -479,4 +497,82 @@ export async function updateSetup(req: Request, res: Response) {
     message: "Setup updated successfully",
     setup: updatedSetup,
   });
+}
+
+export async function toggleVote(req: Request, res: Response) {
+    const setupId = String(req.params.setupId);
+    const userId = (req as any).dbUser.id;
+
+    const setup = await prisma.setup.findUnique({
+        where: { id: setupId },
+    });
+
+    if (!setup) {
+        return res.status(404).json({
+            message: "Setup not found",
+        });
+    }
+
+    if (setup.userId === userId) {
+        return res.status(400).json({
+            message: "Cannot vote on your own setup",
+        });
+    }
+
+    const existingVote = await prisma.vote.findUnique({
+        where: {
+            userId_setupId: {
+                userId,
+                setupId,
+            },
+        },
+    });
+
+    if (existingVote) {
+        const [, updatedSetup] = await prisma.$transaction([
+            prisma.vote.delete({
+                where: {
+                    userId_setupId: {
+                        userId,
+                        setupId,
+                    },
+                },
+            }),
+            prisma.setup.update({
+                where: { id: setupId },
+                data: {
+                    upvoteCount: {
+                        decrement: 1,
+                    },
+                },
+            }),
+        ]);
+
+        return res.json({
+            hasUpvoted: false,
+            upvoteCount: updatedSetup.upvoteCount,
+        });
+    }
+
+    const [, updatedSetup] = await prisma.$transaction([
+        prisma.vote.create({
+            data: {
+                userId,
+                setupId,
+            },
+        }),
+        prisma.setup.update({
+            where: { id: setupId },
+            data: {
+                upvoteCount: {
+                    increment: 1,
+                },
+            },
+        }),
+    ]);
+
+    res.json({
+        hasUpvoted: true,
+        upvoteCount: updatedSetup.upvoteCount,
+    });
 }
