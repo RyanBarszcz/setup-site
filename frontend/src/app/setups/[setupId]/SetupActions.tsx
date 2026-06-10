@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Download, Pencil, ThumbsUp } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Download, Pencil, ThumbsUp, Trash2 } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
 import { toast } from "sonner";
-import { getSetupDownloadUrl, toggleVote } from "@/lib/api";
+import { getSetupDownloadUrl, toggleVote, deleteSetup } from "@/lib/api";
 
 type SetupActionsProps = {
     setupId: string;
@@ -23,6 +24,7 @@ export default function SetupActions({
     isOwner,
 }: SetupActionsProps) {
     const { getToken, isSignedIn } = useAuth();
+    const router = useRouter();
 
     const [upvoteCount, setUpvoteCount] = useState(initialUpvoteCount);
     const [downloadCount, setDownloadCount] = useState(initialDownloadCount);
@@ -76,6 +78,38 @@ export default function SetupActions({
         }
     }
 
+    async function handleDelete() {
+        if (!isOwner) return;
+
+        const confirmed = window.confirm(
+            "Are you sure you want to delete this setup? This cannot be undone."
+        );
+
+        if (!confirmed) return;
+
+        const token = await getToken();
+
+        if (!token) {
+            toast.error("Could not verify your session.");
+            return;
+        }
+
+        try {
+            const toastResult = toast.promise(deleteSetup(setupId, token), {
+                loading: "Deleting setup...",
+                success: "Setup deleted.",
+                error: "Failed to delete setup.",
+            });
+
+            await toastResult.unwrap();
+
+            router.push("/my-setups");
+            router.refresh();
+        } catch {
+            // toast handles error
+        }
+    }
+
     return (
         <div className="mt-10 flex flex-wrap items-center gap-3">
             <button
@@ -91,6 +125,13 @@ export default function SetupActions({
 
             {isOwner ? (
                 <>
+                    {/* Upvote */}
+                    <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-white/70">
+                        <ThumbsUp size={16} />
+                        <span>{upvoteCount.toLocaleString()}</span>
+                    </div>
+
+                    {/* Edit */}
                     <Link
                         href={`/setups/${setupId}/edit`}
                         className="flex items-center gap-2 rounded-full border border-blue-500/20 bg-blue-500/10 px-5 py-3 text-sm font-semibold text-blue-400 transition hover:border-blue-500/50 hover:bg-blue-500/20"
@@ -99,10 +140,14 @@ export default function SetupActions({
                         <span>Edit Setup</span>
                     </Link>
 
-                    <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-white/70">
-                        <ThumbsUp size={16} />
-                        <span>{upvoteCount.toLocaleString()}</span>
-                    </div>
+                    {/* Delete */}
+                    <button
+                        onClick={handleDelete}
+                        className="flex items-center gap-2 rounded-full border border-red-500/20 bg-red-500/10 px-5 py-3 text-sm font-semibold text-red-400 transition hover:cursor-pointer hover:border-red-500/50 hover:bg-red-500/20"
+                    >
+                        <Trash2 size={16} />
+                        <span>Delete Setup</span>
+                    </button>
                 </>
             ) : (
                 <button

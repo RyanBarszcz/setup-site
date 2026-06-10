@@ -663,3 +663,34 @@ export async function handleDownload(req: Request, res: Response) {
         downloadUrl,
     });
 }
+
+// TODO: Later add delete from S3
+export async function deleteSetup(req: Request, res: Response) {
+    const setupId = String(req.params.setupId);
+    const dbUser = (req as any).dbUser;
+    const userId = dbUser?.id;
+
+    const existingSetup = await prisma.setup.findUnique({
+        where: {
+            id: setupId,
+        },
+    });
+
+    if (!existingSetup) {
+        return res.status(404).json({ message: "Setup not found" });
+    }
+
+    if (existingSetup.userId !== userId) {
+        return res.status(403).json({ message: "Not allowed to delete this setup" });
+    }
+
+    await prisma.setup.delete({
+        where: {
+            id: setupId,
+        },
+    });
+
+    res.json({
+        message: "Setup deleted successfully",
+    });
+}

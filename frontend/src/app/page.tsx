@@ -1,9 +1,10 @@
-import Navbar from "@/components/layout/Navbar";
+/* eslint-disable @next/next/no-img-element */
+
+// import Navbar from "@/components/layout/Navbar";
 import HeroSection from "@/components/landing/HeroSection";
 import GameGrid from "@/components/landing/GameGrid";
 import FeatureStrip from "@/components/landing/FeatureStrip";
 
-// TODO: Make setups clickable and have their own page or when you click on it make it a modal that is large
 
 export default function Home() {
   return (

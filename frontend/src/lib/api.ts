@@ -303,3 +303,10 @@ export async function getSetupById(setupId: string, token?: string | null) {
         token,
     });
 }
+
+export async function deleteSetup(setupId: string, token: string) {
+    return apiFetch<{ message: string }>(`/setups/${setupId}/delete`, {
+        method: "DELETE",
+        token,
+    });
+}

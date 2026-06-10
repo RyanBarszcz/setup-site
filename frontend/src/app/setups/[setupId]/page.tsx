@@ -38,6 +38,7 @@ export default async function SetupDetailPage({ params }: PageProps) {
                                 {setup.title}
                             </h1>
 
+                            {/* TODO: Make name link to profile */}
                             <p className="mt-3 text-zinc-400">
                                 Uploaded by{" "}
                                 <span className="text-white">
