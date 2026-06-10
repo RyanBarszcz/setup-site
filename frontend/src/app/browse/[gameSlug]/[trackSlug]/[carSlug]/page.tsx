@@ -51,7 +51,6 @@ export default async function SetupResultsPage({
                     </div>
                 </div>
 
-                {/* TODO: Fix types */}
                 <div className="mt-8">
                     <SetupResultsClient setups={setups} />
                 </div>

@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { useSignUp } from "@clerk/nextjs/legacy";
 import { syncAccount } from "@/lib/api";
+import { toast } from "sonner";
 
-// TODO: Add modal that says creating account
 
 export default function SignUpPage() {
     const router = useRouter();
@@ -36,6 +36,8 @@ export default function SignUpPage() {
 
         if (!isLoaded) return;
 
+        const toastId = toast.loading("Creating account...");
+
         try {
             setLoading(true);
             setError("");
@@ -50,9 +52,18 @@ export default function SignUpPage() {
                 strategy: "email_code",
             });
 
+            toast.success("Verification code sent to your email", {
+                id: toastId,
+            });
+
             setPendingVerification(true);
         } catch (err) {
             console.error(err);
+
+            toast.error("Could not create account", {
+                id: toastId,
+            });
+
             setError("Could not create account.");
         } finally {
             setLoading(false);
@@ -62,6 +73,8 @@ export default function SignUpPage() {
     async function handleVerify(e: React.FormEvent) {
         e.preventDefault();
         if (!isLoaded) return;
+
+        const toastId = toast.loading("Verifying account...");
 
         try {
             setLoading(true);
@@ -82,14 +95,27 @@ export default function SignUpPage() {
                     await syncAccount(token);
                 }
 
+                toast.success("Account created successfully!", {
+                    id: toastId,
+                });
+
                 router.push("/");
                 router.refresh();
                 return;
             }
 
+            toast.error(`Verification failed: ${result.status}`, {
+                id: toastId,
+            });
+
             setError(`Sign up incomplete: ${result.status}`);
         } catch (err) {
             console.error(err);
+
+            toast.error("Invalid verification code", {
+                id: toastId,
+            });
+
             setError("Invalid verification code.");
         } finally {
             setLoading(false);

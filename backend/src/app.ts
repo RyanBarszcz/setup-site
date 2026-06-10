@@ -13,6 +13,9 @@ import { clerkMiddleware } from "@clerk/express";
 const app = express();
 
 // TODO: JWT Specific routes 
+// TODO: Pagination for setup pages on main & profiles
+// TODO: Delete button for your own setups (add the promise toast)
+// TODO: Promise toast for voting
 
 app.use(clerkMiddleware());
 app.use(cors());

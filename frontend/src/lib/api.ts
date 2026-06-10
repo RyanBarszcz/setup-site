@@ -44,6 +44,8 @@ export type SetupOption = {
     game: GameOption;
     track: TrackOption;
     car: CarOption;
+    hasUpvoted: boolean;
+    isOwner: boolean;
     user: {
         id: string;
         username?: string | null;

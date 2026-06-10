@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import {
     getGames,
     getTracksByGame,
@@ -13,8 +14,6 @@ import {
     TrackOption,
     CarOption,
 } from "@/lib/api";
-
-// TODO: Toast instead of alert
 
 const setupTags = [
     "Race",
@@ -68,7 +67,7 @@ export default function EditSetupForm({ setupId }: { setupId: string }) {
             const token = await getToken();
 
             if (!token) {
-                alert("You must be signed in.");
+                toast.error("You must be signed in.");
                 router.push("/login");
                 return;
             }
@@ -103,7 +102,7 @@ export default function EditSetupForm({ setupId }: { setupId: string }) {
                 setCurrentFileName(setup.fileName || "");
             } catch (error) {
                 console.error(error);
-                alert("Failed to load setup.");
+                toast.error("Failed to load setup.");
             } finally {
                 setIsLoading(false);
             }
@@ -167,19 +166,19 @@ export default function EditSetupForm({ setupId }: { setupId: string }) {
         e.preventDefault();
 
         if (!formData.gameId || !formData.trackId || !formData.carId) {
-            alert("Please select a game, track, and car.");
+            toast.error("Please select a game, track, and car.");
             return;
         }
 
         if (!formData.title || !formData.setupType) {
-            alert("Please add a setup name and setup type.");
+            toast.error("Please add a setup name and setup type.");
             return;
         }
 
         const token = await getToken();
 
         if (!token) {
-            alert("You must be signed in.");
+            toast.error("You must be signed in.");
             return;
         }
 
@@ -200,11 +199,11 @@ export default function EditSetupForm({ setupId }: { setupId: string }) {
 
             await updateSetup(setupId, data, token);
 
-            alert("Setup updated successfully.");
+            toast.success("Setup updated successfully.");
             router.push("/my-setups");
         } catch (error) {
             console.error(error);
-            alert("Failed to update setup.");
+            toast.error("Failed to update setup.");
         } finally {
             setIsSubmitting(false);
         }

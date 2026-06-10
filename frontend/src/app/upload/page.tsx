@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
+import { toast } from "sonner";
 import {
     createSetup,
     getGames,
@@ -126,24 +127,24 @@ export default function UploadSetupPage() {
         e.preventDefault();
 
         if (!formData.gameId || !formData.trackId || !formData.carId) {
-            alert("Please select a game, track, and car.");
+            toast.error("Please select a game, track, and car.");
             return;
         }
 
         if (!formData.title || !formData.setupType) {
-            alert("Please add a setup name and setup type.");
+            toast.error("Please add a setup name and setup type.");
             return;
         }
 
         if (!selectedFile) {
-            alert("Please upload a setup file.");
+            toast.error("Please upload a setup file.");
             return;
         }
 
         const token = await getToken();
 
         if (!token) {
-            alert("You must be signed in to upload a setup.");
+            toast.error("You must be signed in to upload a setup.");
             return;
         }
 
@@ -164,10 +165,14 @@ export default function UploadSetupPage() {
             //     console.log(key, value);
             // }
 
-            await createSetup(data, token);
-
-            // TODO: Make a success screen or toast
-            alert("Setup uploaded successfully.");
+            await toast.promise(
+                createSetup(data, token),
+                {
+                    loading: "Uploading setup...",
+                    success: "Setup uploaded successfully",
+                    error: "Failed to upload setup",
+                }
+            );
 
             setFormData({
                 gameId: "",
@@ -189,7 +194,7 @@ export default function UploadSetupPage() {
             setSelectedFile(null);
         } catch (error) {
             console.error(error);
-            alert("Failed to upload setup.");
+            toast.error("Failed to upload setup.");
         } finally {
             setIsSubmitting(false);
         }
