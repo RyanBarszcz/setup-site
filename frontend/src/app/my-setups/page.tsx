@@ -192,6 +192,7 @@ export default function MySetupsPage() {
                         <p className="text-3xl font-bold">
                             {isLoading ? "0" : avgRating}
                         </p>
+                        {/* TODO: Make this total thumbs up */}
                         <p className="mt-1 text-sm uppercase tracking-[0.2em] text-white/40">
                             Avg Rating
                         </p>
