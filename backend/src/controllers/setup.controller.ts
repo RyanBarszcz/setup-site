@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import prisma from "../lib/prisma";
 import { getAuth } from "@clerk/express";
-import { deleteSetupFileFromS3, uploadSetupFileToS3 } from "../lib/s3";
+import { deleteSetupFileFromS3, getSetupFileDownloadUrl, uploadSetupFileToS3 } from "../lib/s3";
 
 function slugify(value: string) {
   return value
@@ -574,5 +574,41 @@ export async function toggleVote(req: Request, res: Response) {
     res.json({
         hasUpvoted: true,
         upvoteCount: updatedSetup.upvoteCount,
+    });
+}
+
+export async function handleDownload(req: Request, res: Response) {
+    const setupId = String(req.params.setupId);
+
+    const setup = await prisma.setup.findUnique({
+        where: {
+            id: setupId,
+        },
+    });
+
+    if (!setup) {
+        return res.status(404).json({
+            message: "Setup not found",
+        });
+    }
+
+    await prisma.setup.update({
+        where: {
+            id: setup.id,
+        },
+        data: {
+            downloadCount: {
+                increment: 1,
+            },
+        },
+    });
+
+    const downloadUrl = await getSetupFileDownloadUrl(
+        setup.fileKey,
+        setup.fileName
+    );
+
+    res.json({
+        downloadUrl,
     });
 }

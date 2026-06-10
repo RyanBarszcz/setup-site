@@ -277,3 +277,11 @@ export async function getUserProfile(username: string) {
         method: "GET",
     });
 }
+
+export async function getSetupDownloadUrl(setupId: string) {
+    return apiFetch<{ 
+        downloadUrl: string 
+    }>(`/setups/${setupId}/download`, {
+        method: "GET",
+    });
+}

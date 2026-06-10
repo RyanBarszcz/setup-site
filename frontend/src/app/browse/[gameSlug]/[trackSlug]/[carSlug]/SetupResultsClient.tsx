@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { ChevronDown, Download, ThumbsUp } from "lucide-react";
 import { toggleVote } from "@/lib/api";
 import { useAuth } from "@clerk/nextjs";
+import { getSetupDownloadUrl } from "@/lib/api";
 
 // TODO: Work on button look for (Most Downloads) options
 
@@ -74,6 +75,27 @@ export default function SetupResultsClient({ setups }: { setups: Setup[] }) {
         );
 
         console.log("SetupList: ", setupList);
+    }
+
+    async function handleDownload(setupId: string) {
+        try {
+            const response = await getSetupDownloadUrl(setupId);
+
+            setSetupList((current) =>
+                current.map((setup) =>
+                    setup.id === setupId
+                        ? {
+                            ...setup,
+                            downloadCount: setup.downloadCount + 1,
+                        }
+                        : setup
+                )
+            );
+
+            window.location.href = response.downloadUrl;
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     function toggleTag(tag: string) {
@@ -238,8 +260,9 @@ export default function SetupResultsClient({ setups }: { setups: Setup[] }) {
                                     </div>
                                 </div>
                                 <div>
-                                    {/* TODO: Make this download the file */}
-                                    <button className="flex items-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-red-500">
+                                    <button
+                                        onClick={() => handleDownload(setup.id)}
+                                        className="flex items-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-red-500 hover:cursor-pointer">
                                         <div className="flex flex-col items-center">
                                             <p>Download</p>
                                             <p>Setup</p>

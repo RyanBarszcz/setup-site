@@ -1,4 +1,5 @@
-import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import crypto from "crypto";
 
 const s3 = new S3Client({
@@ -67,4 +68,18 @@ export async function uploadProfileImageToS3(
     imageKey: key,
     imageUrl: fileUrl,
   };
+}
+
+export async function getSetupFileDownloadUrl(fileKey: string, fileName?: string) {
+    const command = new GetObjectCommand({
+        Bucket: process.env.AWS_S3_BUCKET!,
+        Key: fileKey,
+        ResponseContentDisposition: fileName
+            ? `attachment; filename="${fileName}"`
+            : "attachment",
+    });
+
+    return getSignedUrl(s3, command, {
+        expiresIn: 60,
+    });
 }
