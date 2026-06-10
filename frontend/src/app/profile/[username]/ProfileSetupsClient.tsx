@@ -60,8 +60,8 @@ export default function ProfileSetupsClient({ setups }: { setups: Setup[] }) {
 
                             <div className="mt-5 space-y-1 text-sm text-zinc-500">
                                 <p>{setup.game.name}</p>
-                                <p>{setup.car.name}</p>
                                 <p>{setup.track.name}</p>
+                                <p>{setup.car.name}</p>
                             </div>
                         </Link>
                     ))}

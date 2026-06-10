@@ -42,13 +42,10 @@ export default function MySetupsPage() {
         0
     );
 
-    const avgRating =
-        setups.length > 0
-            ? (
-                setups.reduce((sum, setup) => sum + (setup.rating ?? 0), 0) /
-                setups.length
-            ).toFixed(1)
-            : "0";
+    const totalUpvotes = setups.reduce(
+        (sum, setup) => sum + (setup.upvoteCount ?? 0),
+        0
+    );
 
     async function loadSetups() {
         try {
@@ -190,11 +187,10 @@ export default function MySetupsPage() {
 
                     <div className="rounded-3xl border border-white/10 bg-black/35 p-6 backdrop-blur-md">
                         <p className="text-3xl font-bold">
-                            {isLoading ? "0" : avgRating}
+                            {isLoading ? "0" : totalUpvotes}
                         </p>
-                        {/* TODO: Make this total thumbs up */}
                         <p className="mt-1 text-sm uppercase tracking-[0.2em] text-white/40">
-                            Avg Rating
+                            Total Upvotes
                         </p>
                     </div>
                 </section>

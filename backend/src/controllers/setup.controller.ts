@@ -364,6 +364,56 @@ export async function createSetup(req: Request, res: Response) {
     }
 }
 
+export async function getSetupById(req: Request, res: Response) {
+    const setupId = String(req.params.setupId);
+
+    const dbUser = (req as any).dbUser;
+    const userId = dbUser?.id;
+
+    const setup = await prisma.setup.findUnique({
+        where: { id: setupId },
+        include: {
+            game: true,
+            track: true,
+            car: true,
+            user: {
+                select: {
+                    id: true,
+                    username: true,
+                    imageUrl: true,
+                },
+            },
+            tags: {
+                include: {
+                    tag: true,
+                },
+            },
+            votes: userId
+                ? {
+                      where: {
+                          userId,
+                      },
+                      select: {
+                          id: true,
+                      },
+                  }
+                : false,
+        },
+    });
+
+    if (!setup) {
+        return res.status(404).json({ message: "Setup not found" });
+    }
+
+    res.json({
+        setup: {
+            ...setup,
+            isOwner: userId ? setup.userId === userId : false,
+            hasUpvoted: userId ? setup.votes.length > 0 : false,
+        },
+    });
+}
+
 export async function getSetupForEdit(req: Request, res: Response) {
   const setupId = String(req.params.setupId);
   const dbUser = (req as any).dbUser;
@@ -396,6 +446,7 @@ export async function getSetupForEdit(req: Request, res: Response) {
   });
 }
 
+// TODO: Needs to handle a new file upload
 export async function updateSetup(req: Request, res: Response) {
   const setupId = String(req.params.setupId);
   const dbUser = (req as any).dbUser;

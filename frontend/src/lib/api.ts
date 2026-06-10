@@ -38,26 +38,36 @@ export type SetupOption = {
     downloadCount: number;
     upvoteCount: number;
     lapTimeMs?: number | null;
+
     setupType: string;
-    weatherType: string;
+    weatherType?: string | null;
+
+    visibility?: string | null;
+    trackCondition?: string | null;
+    temperatureF?: number | null;
+    fuelLoad?: number | null;
+    tireCompound?: string | null;
+
     createdAt: string;
     game: GameOption;
     track: TrackOption;
     car: CarOption;
-    hasUpvoted: boolean;
-    isOwner: boolean;
     user: {
         id: string;
         username?: string | null;
         imageUrl?: string | null;
     };
-    tags: {
+
+    tags?: {
         tag: {
             id: string;
             name: string;
             slug: string;
         };
     }[];
+
+    isOwner?: boolean;
+    hasUpvoted?: boolean;
 };
 
 export type SetupEditOption = {
@@ -285,5 +295,11 @@ export async function getSetupDownloadUrl(setupId: string) {
         downloadUrl: string 
     }>(`/setups/${setupId}/download`, {
         method: "GET",
+    });
+}
+
+export async function getSetupById(setupId: string, token?: string | null) {
+    return apiFetch<{ setup: SetupOption }>(`/setups/${setupId}`, {
+        token,
     });
 }
