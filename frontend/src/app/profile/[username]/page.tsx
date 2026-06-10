@@ -1,10 +1,14 @@
 import Link from "next/link";
+import { currentUser } from "@clerk/nextjs/server";
 import ProfileSetupsClient from "./ProfileSetupsClient";
+import ProfileAvatar from "@/components/profile/ProfileAvatar";
+import { getUserProfile } from "@/lib/api";
 
 type ProfileUser = {
     id: string;
     username: string;
-    image: string | null;
+    imageUrl: string | null;
+    createdAt: string;
 };
 
 type Setup = {
@@ -22,28 +26,14 @@ type Setup = {
     };
 };
 
-async function getProfile(username: string) {
-    const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/users/profile/${username}`,
-        {
-            cache: "no-store",
-        }
-    );
-
-    if (!res.ok) {
-        return null;
-    }
-
-    return res.json();
-}
-
 export default async function ProfilePage({
     params,
 }: {
     params: Promise<{ username: string }>;
 }) {
     const { username } = await params;
-    const data = await getProfile(username);
+    const data = await getUserProfile(username);
+    const clerkUser = await currentUser();
 
     if (!data) {
         return (
@@ -59,6 +49,18 @@ export default async function ProfilePage({
     const user: ProfileUser = data.user;
     const setups: Setup[] = data.setups;
 
+    const joinedDate = new Date(user.createdAt).toLocaleDateString("en-US", {
+        month: "long",
+        year: "numeric",
+    });
+
+    const isOwnProfile =
+        clerkUser?.username?.toLowerCase() === user.username.toLowerCase();
+
+    // console.log("clerk username:", clerkUser?.username);
+    // console.log("profile username:", user.username);
+    // console.log("isOwnProfile:", isOwnProfile);
+
     return (
         <main
             className="min-h-screen bg-cover bg-center bg-fixed px-8 pt-28 text-white"
@@ -68,29 +70,31 @@ export default async function ProfilePage({
             }}
         >
             <section className="mx-auto max-w-6xl">
-                <div className="flex items-center gap-6 rounded-3xl border border-white/10 bg-white/[0.03] p-8">
-                    <div className="flex h-24 w-24 items-center justify-center rounded-full bg-zinc-800 text-3xl font-black uppercase">
-                        {user.image ? (
-                            <img
-                                src={user.image}
-                                alt={user.username}
-                                className="h-full w-full rounded-full object-cover"
+                <div className="flex items-center justify-between gap-6 rounded-3xl border border-white/10 bg-white/[0.03] p-8">
+                    <div className="flex items-center gap-6">
+                        <div className="relative">
+                            <ProfileAvatar
+                                username={user.username}
+                                imageUrl={user.imageUrl}
+                                isOwnProfile={isOwnProfile}
+                                size="lg"
                             />
-                        ) : (
-                            user.username[0]
-                        )}
-                    </div>
+                        </div>
 
-                    <div>
-                        <p className="text-sm uppercase tracking-[0.3em] text-red-500">
-                            Driver Profile
-                        </p>
-                        <h1 className="mt-2 text-4xl font-black">
-                            @{user.username}
-                        </h1>
-                        <p className="mt-2 text-zinc-400">
-                            {setups.length} uploaded setup{setups.length === 1 ? "" : "s"}
-                        </p>
+                        <div>
+                            <p className="text-sm uppercase tracking-[0.3em] text-red-500">
+                                Driver Profile
+                            </p>
+
+                            <h1 className="mt-2 text-4xl font-black">
+                                @{user.username}
+                            </h1>
+
+                            <p className="mt-2 text-zinc-400">
+                                Joined {joinedDate} • {setups.length} uploaded setup
+                                {setups.length === 1 ? "" : "s"}
+                            </p>
+                        </div>
                     </div>
                 </div>
 

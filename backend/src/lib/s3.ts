@@ -41,3 +41,30 @@ export async function deleteSetupFileFromS3(fileKey: string) {
         })
     );
 }
+
+export async function uploadProfileImageToS3(
+  file: Express.Multer.File,
+  userId: string
+) {
+  const fileExtension = file.originalname.split(".").pop();
+  const safeName = crypto.randomUUID();
+
+  const key = `profile-images/${userId}/${safeName}.${fileExtension}`;
+  const fileUrl = `https://${process.env.AWS_S3_BUCKET!}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+
+  await s3.send(
+    new PutObjectCommand({
+      Bucket: process.env.AWS_S3_BUCKET!,
+      Key: key,
+      Body: file.buffer,
+      ContentType: file.mimetype,
+    })
+  );
+
+  // console.log("Sending photo...");
+
+  return {
+    imageKey: key,
+    imageUrl: fileUrl,
+  };
+}

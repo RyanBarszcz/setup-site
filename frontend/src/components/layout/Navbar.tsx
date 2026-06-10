@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useClerk, useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
-
-// TODO: Make profile be clickable and be able to option a users profile so they can edit info
+import ProfileAvatar from "@/components/profile/ProfileAvatar";
+import { getUserProfile } from "@/lib/api";
 
 export default function Navbar() {
     const { signOut } = useClerk();
@@ -14,19 +14,40 @@ export default function Navbar() {
         id: string;
         username: string;
         name: string | null;
-        image: string | null;
+        imageUrl: string | null;
     };
+
+    const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
+    const [search, setSearch] = useState("");
+    const [results, setResults] = useState<UserResult[]>([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const [showResults, setShowResults] = useState(false);
+
+    const username = user?.username ?? null;
+    const initial = username?.[0] || "U";
 
     async function handleLogout() {
         await signOut();
     }
 
-    const initial = user?.username?.[0] || "U";
+    useEffect(() => {
+        async function loadProfileImage() {
+            if (!isSignedIn || !username) {
+                setProfileImageUrl(null);
+                return;
+            }
 
-    const [search, setSearch] = useState("");
-    const [results, setResults] = useState<UserResult[]>([]);
-    const [isSearching, setIsSearching] = useState(false);
-    const [showResults, setShowResults] = useState(false);
+            try {
+                const data = await getUserProfile(username);
+                setProfileImageUrl(data.user.imageUrl);
+            } catch (err) {
+                console.error("Failed to load profile image:", err);
+                setProfileImageUrl(null);
+            }
+        }
+
+        loadProfileImage();
+    }, [isSignedIn, username]);
 
     useEffect(() => {
         const value = search.trim();
@@ -91,7 +112,6 @@ export default function Navbar() {
                             className="w-72 rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm text-zinc-200 placeholder:text-zinc-500 outline-none transition focus:border-red-500/50 focus:bg-white/10"
                         />
 
-                        {/* TODO: Work on the profile image part */}
                         {showResults && search.trim().length >= 2 && (
                             <div className="absolute right-0 mt-3 w-80 overflow-hidden rounded-2xl border border-white/10 bg-zinc-950 shadow-2xl">
                                 {isSearching ? (
@@ -110,12 +130,12 @@ export default function Navbar() {
                                             }}
                                             className="flex items-center gap-3 px-5 py-4 transition hover:bg-white/5"
                                         >
-                                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-800 text-sm font-bold uppercase text-white">
-                                                {result.image ? (
+                                            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-zinc-800 text-sm font-bold uppercase text-white">
+                                                {result.imageUrl ? (
                                                     <img
-                                                        src={result.image}
+                                                        src={result.imageUrl}
                                                         alt={result.username}
-                                                        className="h-full w-full rounded-full object-cover"
+                                                        className="h-full w-full object-cover"
                                                     />
                                                 ) : (
                                                     result.username[0]
@@ -138,7 +158,7 @@ export default function Navbar() {
                         )}
                     </div>
 
-                    {!isSignedIn ? (
+                    {!isSignedIn || !username ? (
                         <>
                             <Link
                                 href="/login"
@@ -156,9 +176,13 @@ export default function Navbar() {
                         </>
                     ) : (
                         <>
-                            <div className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-zinc-800 text-sm font-bold uppercase text-white">
-                                {initial}
-                            </div>
+                            <Link href={`/profile/${username}`}>
+                                <ProfileAvatar
+                                    username={username}
+                                    imageUrl={profileImageUrl}
+                                    size="sm"
+                                />
+                            </Link>
 
                             <button
                                 onClick={handleLogout}

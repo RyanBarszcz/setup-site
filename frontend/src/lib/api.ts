@@ -77,6 +77,28 @@ export type SetupEditOption = {
     tags: string[];
 };
 
+export type ProfileUser = {
+    id: string;
+    username: string;
+    imageUrl: string | null;
+    createdAt: string;
+};
+
+export type ProfileSetup = {
+    id: string;
+    title: string;
+    description: string | null;
+    game: {
+        name: string;
+    };
+    car: {
+        name: string;
+    };
+    track: {
+        name: string;
+    };
+};
+
 export async function apiFetch<T>(
     path: string,
     options: ApiFetchOptions = {}
@@ -227,5 +249,31 @@ export async function toggleVote(
     }>(`/setups/${setupId}/vote`, {
         method: "POST",
         token,
+    });
+}
+
+export async function updateProfileImage(
+    formData: FormData,
+    token: string
+) {
+    return apiFetch<{
+        user: {
+            id: string;
+            username: string;
+            imageUrl: string | null;
+        };
+    }>("/users/profile-image", {
+        method: "PATCH",
+        body: formData,
+        token,
+    });
+}
+
+export async function getUserProfile(username: string) {
+    return apiFetch<{
+        user: ProfileUser;
+        setups: ProfileSetup[];
+    }>(`/users/profile/${username}`, {
+        method: "GET",
     });
 }
