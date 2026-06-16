@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import prisma from "../lib/prisma";
-import { getAuth } from "@clerk/express";
 import { deleteSetupFileFromS3, getSetupFileDownloadUrl, uploadSetupFileToS3 } from "../lib/s3";
 
 function slugify(value: string) {
@@ -181,26 +180,7 @@ export async function getSetups(req: Request, res: Response) {
 
 export async function getMySetups(req: Request, res: Response) {
     try {
-        const { userId } = getAuth(req);
-
-
-        if (!userId) {
-            return res.status(401).json({
-                message: "Unauthorized",
-            });
-        }
-
-        const dbUser = await prisma.user.findUnique({
-            where: {
-                clerkId: userId,
-            },
-        });
-
-        if (!dbUser) {
-            return res.status(404).json({
-                message: "User not found",
-            });
-        }
+        const dbUser = (req as any).dbUser;
 
         const setups = await prisma.setup.findMany({
             where: {
