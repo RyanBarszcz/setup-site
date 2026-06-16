@@ -31,6 +31,9 @@ export default function Home() {
       {/* Foreground Content */}
       <div className="relative z-10">
         <div className="mx-auto max-w-[1800px] px-12 pt-20 pb-20">
+          <div className="mt-4 rounded-2xl border border-yellow-500/20 bg-yellow-500/10 px-4 py-3 text-sm text-yellow-300">
+            🚧 Track and car images are currently being seeded and expanded.
+          </div>
           <HeroSection />
           <GameGrid />
           <FeatureStrip />

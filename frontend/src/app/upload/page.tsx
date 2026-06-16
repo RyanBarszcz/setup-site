@@ -26,6 +26,8 @@ const setupTags = [
     "Endurance",
 ];
 
+// TODO: Make them sign in first
+
 // TODO: Work on requests
 // TODO: Later add manufacturer then model
 // TODO: Make boxes look like the one from final browse
