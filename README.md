@@ -4,7 +4,7 @@ A community-driven platform for sim racers to discover, share, and download car 
 
 ## Live Demo
 
-**Frontend:** [Your Vercel URL]
+**Frontend:** [\[Your Vercel URL\]](https://frontend-setup-site.vercel.app/)
 
 ## Features
 
@@ -93,7 +93,21 @@ Frontend communicates with a REST API built with Express and Prisma. Uploaded se
 
 ## Screenshots
 
-*Add screenshots here after deployment.*
+### Home Page
+
+![Home Page](README-assets/home.png)
+
+### Browse Setups
+
+![Browse](README-assets/browse.png)
+
+### Upload Setup
+
+![Upload](README-assets/upload.png)
+
+### User Profile
+
+![Profile](README-assets/profile.png)
 
 ## Local Development
 
@@ -119,5 +133,4 @@ Ryan Barszcz
 
 Computer Science Graduate — University of Michigan
 
-GitHub: https://github.com/RyanBarszcz
 Portfolio: https://ryanbarszcz.com
