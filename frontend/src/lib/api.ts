@@ -58,7 +58,7 @@ export type SetupOption = {
         imageUrl?: string | null;
     };
 
-    tags?: {
+    tags: {
         tag: {
             id: string;
             name: string;

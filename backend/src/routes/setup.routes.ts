@@ -14,6 +14,7 @@ const upload = multer({
 });
 
 router.get("/", attachUserOptional, getSetups);
+// TODO: Protect route
 router.get("/mine", getMySetups);
 router.post("/", requireAuth, attachUser, upload.single("setupFile"), createSetup);
 router.get("/:setupId", attachUserOptional, getSetupById);

@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { ChevronDown, Download, ThumbsUp } from "lucide-react";
 import { toggleVote } from "@/lib/api";
 import { useAuth } from "@clerk/nextjs";
-import { getSetupDownloadUrl } from "@/lib/api";
+import { getSetupDownloadUrl } from "@/lib/api"
+import { useRouter } from "next/navigation";
 
-// TODO: Work on button look for (Most Downloads) options
+// TODO: Move pagination/filtering to backend when setup count grows.
 
 const tags = [
     "Race",
@@ -30,8 +31,8 @@ type Setup = {
     downloadCount: number;
     upvoteCount: number;
     createdAt: string;
-    hasUpvoted: boolean;
-    isOwner: boolean,
+    hasUpvoted?: boolean;
+    isOwner?: boolean,
     user: {
         username?: string | null;
     };
@@ -44,11 +45,16 @@ type Setup = {
 };
 
 export default function SetupResultsClient({ setups }: { setups: Setup[] }) {
+    const PAGE_SIZE = 20;
+
     const { getToken, isSignedIn } = useAuth();
     const [setupList, setSetupList] = useState(setups);
     const [search, setSearch] = useState("");
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [sort, setSort] = useState("Most Downloads");
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const router = useRouter();
 
     async function handleVote(setupId: string) {
         const setup = setupList.find((item) => item.id === setupId);
@@ -144,6 +150,17 @@ export default function SetupResultsClient({ setups }: { setups: Setup[] }) {
         return result;
     }, [setupList, search, selectedTags, sort]);
 
+    const totalPages = Math.ceil(filteredSetups.length / PAGE_SIZE);
+
+    const paginatedSetups = filteredSetups.slice(
+        (currentPage - 1) * PAGE_SIZE,
+        currentPage * PAGE_SIZE
+    );
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [search, selectedTags, sort]);
+
     return (
         <>
             <div className="mt-8 flex gap-4">
@@ -181,7 +198,10 @@ export default function SetupResultsClient({ setups }: { setups: Setup[] }) {
                     return (
                         <button
                             key={tag}
-                            onClick={() => toggleTag(tag)}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                toggleTag(tag);
+                            }}
                             className={`rounded-full border px-4 py-2 text-sm backdrop-blur-md transition ${active
                                 ? "border-red-500/70 bg-red-500/20 text-white"
                                 : "border-white/10 bg-white/5 text-white/70 hover:border-red-500/50 hover:bg-red-500/10 hover:text-white"
@@ -194,10 +214,11 @@ export default function SetupResultsClient({ setups }: { setups: Setup[] }) {
             </div>
 
             <section className="mt-10 space-y-5">
-                {filteredSetups.map((setup) => (
+                {paginatedSetups.map((setup) => (
                     <article
+                        onClick={() => router.push(`/setups/${setup.id}`)}
                         key={setup.id}
-                        className="rounded-3xl border border-white/10 bg-black/35 p-5 backdrop-blur-md transition hover:border-red-500/40 hover:bg-black/50"
+                        className="cursor-pointer rounded-3xl border border-white/10 bg-black/35 p-5 backdrop-blur-md transition hover:border-red-500/40 hover:bg-black/50"
                     >
                         <div className="flex items-center justify-between gap-8">
                             <div className="flex-1">
@@ -214,7 +235,10 @@ export default function SetupResultsClient({ setups }: { setups: Setup[] }) {
                                         </div>
                                     ) : (
                                         <button
-                                            onClick={() => handleVote(setup.id)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleVote(setup.id);
+                                            }}
                                             className={`flex items-center gap-2 rounded-full border px-3 py-1 text-xs transition ${setup.hasUpvoted
                                                 ? "border-green-500/50 bg-green-500/10 text-green-400"
                                                 : "border-white/10 bg-white/5 text-white/70 hover:border-green-500/50 hover:text-green-400"
@@ -238,7 +262,10 @@ export default function SetupResultsClient({ setups }: { setups: Setup[] }) {
                                     {setup.tags.slice(0, 3).map((item) => (
                                         <button
                                             key={item.tag.id}
-                                            onClick={() => toggleTag(item.tag.name)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                toggleTag(item.tag.name);
+                                            }}
                                             className="rounded-full bg-white/10 px-3 py-1 text-xs text-white/70 transition hover:bg-red-500/20 hover:text-white"
                                         >
                                             {item.tag.name}
@@ -261,7 +288,10 @@ export default function SetupResultsClient({ setups }: { setups: Setup[] }) {
                                 </div>
                                 <div>
                                     <button
-                                        onClick={() => handleDownload(setup.id)}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDownload(setup.id);
+                                        }}
                                         className="flex items-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-red-500 hover:cursor-pointer">
                                         <div className="flex flex-col items-center">
                                             <p>Download</p>
@@ -279,12 +309,40 @@ export default function SetupResultsClient({ setups }: { setups: Setup[] }) {
                     </article>
                 ))}
 
+
+
                 {filteredSetups.length === 0 && (
                     <div className="rounded-3xl border border-white/10 bg-white/5 p-8 text-white/60 backdrop-blur-md">
                         No setups matched your search.
                     </div>
                 )}
             </section>
+
+            {totalPages > 1 && (
+                <div className="mt-10 flex items-center justify-center gap-4">
+                    <button
+                        onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                        className="rounded-xl border border-white/10 px-4 py-2 text-sm text-white transition hover:border-red-500/50 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                        Previous
+                    </button>
+
+                    <div className="text-sm text-white/60">
+                        Page {currentPage} of {totalPages}
+                    </div>
+
+                    <button
+                        onClick={() =>
+                            setCurrentPage((p) => Math.min(totalPages, p + 1))
+                        }
+                        disabled={currentPage === totalPages}
+                        className="rounded-xl border border-white/10 px-4 py-2 text-sm text-white transition hover:border-red-500/50 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                        Next
+                    </button>
+                </div>
+            )}
         </>
     );
 }

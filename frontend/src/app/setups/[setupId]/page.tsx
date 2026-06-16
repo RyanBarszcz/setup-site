@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import { getSetupById } from "@/lib/api";
 import SetupActions from "./SetupActions";
+import Link from "next/link";
 
 type PageProps = {
     params: Promise<{
@@ -38,12 +39,13 @@ export default async function SetupDetailPage({ params }: PageProps) {
                                 {setup.title}
                             </h1>
 
-                            {/* TODO: Make name link to profile */}
                             <p className="mt-3 text-zinc-400">
                                 Uploaded by{" "}
-                                <span className="text-white">
+                                <Link
+                                    href={`/profile/${setup.user.username}`}
+                                    className="text-white transition hover:text-red-400">
                                     @{setup.user?.username || "Unknown User"}
-                                </span>
+                                </Link>
                             </p>
                         </div>
                     </div>
