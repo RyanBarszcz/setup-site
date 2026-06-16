@@ -2,9 +2,11 @@
 
 A community-driven platform for sim racers to discover, share, and download car setups for popular racing simulators.
 
+![SetupsRUS Home Page](README-assets/home.png)
+
 ## Live Demo
 
-**Frontend:** \[https://setupsrus.com\](https://frontend-setup-site.vercel.app/)
+**Frontend:** [https://setupsrus.com](https://frontend-setup-site.vercel.app/)
 
 ## Features
 
