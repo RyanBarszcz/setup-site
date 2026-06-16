@@ -4,7 +4,7 @@ A community-driven platform for sim racers to discover, share, and download car 
 
 ## Live Demo
 
-**Frontend:** [\[Your Vercel URL\]](https://frontend-setup-site.vercel.app/)
+**Frontend:** \[https://setupsrus.com\](https://frontend-setup-site.vercel.app/)
 
 ## Features
 
