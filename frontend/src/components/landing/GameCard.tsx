@@ -3,6 +3,9 @@ import Link from "next/link";
 type GameCardProps = {
     id: string;
     name: string;
+    slug: string;
+    imageUrl?: string | null;
+    setupCount: number;
     index: number;
 };
 
@@ -17,18 +20,21 @@ const gameImages: Record<string, string> = {
 export default function GameCard({
     id,
     name,
+    slug,
+    imageUrl,
+    setupCount,
     index,
 }: GameCardProps) {
     return (
         <Link
-            href={`/setups?gameId=${id}`}
+            href={`/browse/${slug}`}
             className={`group relative h-64 overflow-hidden rounded-[1.8rem] border transition duration-300 hover:-translate-y-1 ${index === 0
                 ? "border-red-500 shadow-[0_0_35px_rgba(220,38,38,0.28)]"
                 : "border-white/10"
                 }`}
         >
             <img
-                src={gameImages[name]}
+                src={imageUrl || gameImages[name]}
                 alt={name}
                 className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
             />
@@ -37,32 +43,16 @@ export default function GameCard({
 
             <div className="absolute inset-0 bg-black/25" />
 
-            <div className="absolute bottom-5 left-5 right-5">
-                <h2 className="text-2xl font-black italic uppercase leading-tight text-white">
-                    {name}
-                </h2>
+            <h2 className="absolute left-5 top-5 right-5 text-2xl font-black italic uppercase leading-tight text-white">
+                {name}
+            </h2>
 
-                <div className="mt-5 flex items-center justify-between">
-                    <div>
-                        <p className="text-xl font-black text-red-500">
-                            {12540 - index * 2100}
-                        </p>
-
-                        <p className="text-[11px] uppercase tracking-[0.25em] text-zinc-400">
-                            Setups
-                        </p>
-                    </div>
-
-                    {/* <div className="text-right">
-                        <p className="text-xl font-black text-white">
-                            {15231 - index * 2500}
-                        </p>
-
-                        <p className="text-[11px] uppercase tracking-[0.25em] text-zinc-400">
-                            Drivers
-                        </p>
-                    </div> */}
-                </div>
+            <div className="absolute bottom-5 left-5">
+                <p className="text-md font-semibold text-zinc-300">
+                    <span className="text-red-500">
+                        {setupCount.toLocaleString()}
+                    </span> {" "} Setups
+                </p>
             </div>
         </Link>
     );

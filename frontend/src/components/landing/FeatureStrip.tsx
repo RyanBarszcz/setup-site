@@ -27,13 +27,21 @@ export default function FeatureStrip() {
             {features.map((feature) => (
                 <div
                     key={feature.title}
-                    className="border-r border-white/10 px-8 last:border-r-0"
+                    className="flex items-start gap-4 border-r border-white/10 px-8 last:border-r-0"
                 >
-                    <div className="text-3xl text-red-500">{feature.icon}</div>
-                    <h3 className="mt-3 font-bold uppercase">{feature.title}</h3>
-                    <p className="mt-2 text-sm leading-6 text-zinc-400">
-                        {feature.text}
-                    </p>
+                    <div className="text-6xl text-red-500">
+                        {feature.icon}
+                    </div>
+
+                    <div>
+                        <h3 className="font-bold uppercase">
+                            {feature.title}
+                        </h3>
+
+                        <p className="mt-2 text-sm leading-6 text-zinc-400">
+                            {feature.text}
+                        </p>
+                    </div>
                 </div>
             ))}
         </div>

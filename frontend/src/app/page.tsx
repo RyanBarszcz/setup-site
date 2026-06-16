@@ -28,7 +28,6 @@ export default function Home() {
         <div className="fixed inset-0 bg-gradient-to-b from-black/20 via-transparent to-[#050505]" />
       </div>
 
-      {/* TODO: Make games and their data real */}
       {/* Foreground Content */}
       <div className="relative z-10">
         <div className="mx-auto max-w-[1800px] px-12 pt-20 pb-20">
