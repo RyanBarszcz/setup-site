@@ -6,7 +6,7 @@ A community-driven platform for sim racers to discover, share, and download car 
 
 ## Live Demo
 
-**Frontend:** [https://setupsrus.com](https://setupsrus.com)
+**Frontend:** [https://setupsrus.com](https://setupsrus.com/)
 
 ## Features
 
