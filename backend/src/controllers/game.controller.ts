@@ -75,7 +75,13 @@ export async function getPopularGames(
 
 export async function getGameBySlug(req: Request, res: Response) {
     try {
-        const { slug } = req.params;
+        const slug = req.params.slug;
+
+        if (typeof slug !== "string") {
+            return res.status(400).json({
+                message: "Invalid game slug",
+            });
+        }
 
         const game = await prisma.game.findUnique({
             where: {
